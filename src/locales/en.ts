@@ -378,6 +378,7 @@ export const en: Dict = {
     follow: 'Follow',
     rights: '© {year} {coach}. All rights reserved.',
     sample: 'This site is a template showing sample content: the names, results, reviews and pictures are illustrative samples, not real people.',
+    madeBy: 'Designed and built by',
     toTop: 'Back to top',
   },
   days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],

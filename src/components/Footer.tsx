@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Locale } from '@/lib/i18n';
 import { dict, fill } from '@/lib/i18n';
-import { coach } from '@/lib/config';
+import { coach, features } from '@/lib/config';
 import { route } from '@/lib/routes';
 import { whatsappUrl } from '@/lib/whatsapp';
 import EmailText from './EmailText';
@@ -71,7 +71,23 @@ export default function Footer({ lang }: { lang: Locale }) {
             <span>{t.footer.sample}</span>
           </p>
         )}
-        <p>{fill(t.footer.rights, { year: new Date().getFullYear(), coach: coach.name[lang] })}</p>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <p>{fill(t.footer.rights, { year: new Date().getFullYear(), coach: coach.name[lang] })}</p>
+          {features.credit && (
+            <p>
+              {t.footer.madeBy}{' '}
+              <a
+                href={features.credit.url[lang]}
+                target="_blank"
+                rel="noopener"
+                className="inline-flex min-h-11 items-center font-bold text-ink underline decoration-accent-text decoration-2 underline-offset-4 hover:text-accent-text"
+              >
+                {features.credit.name[lang]}
+                <span className="sr-only"> {t.common.newTab}</span>
+              </a>
+            </p>
+          )}
+        </div>
       </div>
     </footer>
   );

@@ -4,4 +4,9 @@ import type { FeaturesConfig } from './types.ts';
 export const features: FeaturesConfig = {
   // Off until the coach has approved articles under his name.
   blog: false,
+  // The site builder's credit in the footer.
+  credit: {
+    name: { ar: 'بلال ناجي', en: 'Belal Nagy' },
+    url: { ar: 'https://www.belalnagy.com/ar', en: 'https://www.belalnagy.com' },
+  },
 };

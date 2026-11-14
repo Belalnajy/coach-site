@@ -158,6 +158,11 @@ export interface FeaturesConfig {
    * until the coach has approved them.
    */
   blog: boolean;
+  /**
+   * The "made by" line at the very bottom of every page. Leave it out to show
+   * nothing. `url` is per language so each side links to the same language.
+   */
+  credit?: { name: Localized; url: Localized };
 }
 
 export type ColorMode = 'dark' | 'light';

@@ -131,6 +131,13 @@ export const validateConfig = (config: SiteConfig): string[] => {
     ach.photos?.forEach((ph, j) => picture('coach.ts', `${at}.photos[${j}]`, ph));
   });
   if (typeof config.features?.blog !== 'boolean') fail('features.ts', 'blog', 'must be true or false', config.features?.blog);
+  if (config.features?.credit) {
+    const c = config.features.credit;
+    for (const l of ['ar', 'en'] as const) {
+      if (!c.name?.[l]?.trim()) fail('features.ts', `credit.name.${l}`, 'needs a name');
+      if (!/^https:\/\//.test(c.url?.[l] ?? '')) fail('features.ts', `credit.url.${l}`, 'must be an https:// link', c.url?.[l]);
+    }
+  }
   picture('coach.ts', 'images.hero', coach.images.hero);
   picture('coach.ts', 'images.portrait', coach.images.portrait);
   if (coach.images.map) picture('coach.ts', 'images.map', coach.images.map);
