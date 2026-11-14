@@ -3,6 +3,7 @@ import type { Locale } from '@/lib/i18n';
 import { dict } from '@/lib/i18n';
 import { coach } from '@/lib/config';
 import { whatsappUrl } from '@/lib/whatsapp';
+import { bookingData } from '@/lib/booking-data';
 import BookingForm from '../BookingForm';
 import BookingPageForm from '../BookingPageForm';
 import Icon from '../Icon';
@@ -10,12 +11,13 @@ import PageHeader from '../PageHeader';
 
 export default function BookPage({ lang }: { lang: Locale }) {
   const t = dict(lang);
+  const data = bookingData(lang);
   return (
     <>
       <PageHeader eyebrow={t.book.eyebrow} title={t.book.title} intro={t.book.intro} />
       <div className="container-x py-10 md:py-14">
-        <Suspense fallback={<BookingForm lang={lang} variant="page" />}>
-          <BookingPageForm lang={lang} />
+        <Suspense fallback={<BookingForm data={data} variant="page" />}>
+          <BookingPageForm data={data} />
         </Suspense>
         <div className="mt-14 grid gap-5 md:grid-cols-2">
           <section className="card p-6 md:p-8" aria-labelledby="next-title">

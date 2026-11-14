@@ -68,7 +68,7 @@ export default function HeaderBar({
                     className={`relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[0.95rem] font-bold transition hover:text-ink ${active ? 'text-ink' : 'text-muted'}`}
                   >
                     {label}
-                    {active && <span className="absolute inset-x-3.5 bottom-1.5 h-[3px] rounded-full bg-accent" aria-hidden="true" />}
+                    {active && <span className="absolute inset-x-3.5 bottom-1.5 h-[3px] rounded-full bg-selected" aria-hidden="true" />}
                   </Link>
                 </li>
               );
@@ -92,7 +92,7 @@ export default function HeaderBar({
           if (e.target === e.currentTarget) menu.current?.close();
         }}
       >
-        <div className="flex max-h-[inherit] flex-col overflow-y-auto px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
           <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line md:hidden" aria-hidden="true" />
           <div className="mb-2 flex items-center justify-between">
             <p className="text-lg font-black">{coachName}</p>
@@ -110,7 +110,7 @@ export default function HeaderBar({
                       href={href}
                       aria-current={active ? 'page' : undefined}
                       onClick={() => menu.current?.close()}
-                      className={`flex min-h-16 items-center gap-3 rounded-2xl border px-4 font-bold transition ${active ? 'border-accent bg-accent/10' : 'border-line bg-surface-2'}`}
+                      className={`flex min-h-16 items-center gap-3 rounded-2xl border px-4 font-bold transition ${active ? 'border-selected bg-selected/10' : 'border-line bg-surface-2'}`}
                     >
                       <Icon name={icon} size={20} className={active ? 'text-accent-text' : 'text-muted'} />
                       {label}

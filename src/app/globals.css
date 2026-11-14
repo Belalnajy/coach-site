@@ -20,6 +20,9 @@
   --color-accent-text: var(--accent-text);
   --color-hot: var(--hot);
   --color-on-hot: var(--on-hot);
+  --color-hot-text: var(--hot-text);
+  --color-selected: var(--selected);
+  --color-on-selected: var(--on-selected);
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-latin), var(--font-body), ui-sans-serif, sans-serif;
   --ease-snap: cubic-bezier(0.2, 0.9, 0.1, 1);
@@ -214,12 +217,24 @@
   .chip:active {
     transform: scale(0.96);
   }
+  /* Selected: the theme's `selected` fill (the accent on dark, a deep shade
+     on light, so it stands out 3:1 from the page) plus a check mark. */
   .chip[aria-pressed='true'],
   .chip[aria-selected='true'],
   input:checked + .chip {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--on-accent);
+    background: var(--selected);
+    border-color: var(--selected);
+    color: var(--on-selected);
+  }
+  .chip[aria-pressed='true']::before,
+  input:checked + .chip::before {
+    content: '';
+    width: 0.85em;
+    height: 0.85em;
+    margin-inline-end: 0.1rem;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
   }
   input:focus-visible + .chip {
     outline: 3px solid var(--accent-text);
@@ -290,7 +305,8 @@
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-text) 30%, transparent);
   }
   .input[aria-invalid='true'] {
-    border-color: var(--hot);
+    border-color: var(--hot-text);
+    box-shadow: 0 0 0 1px var(--hot-text);
   }
 
   .prose-coach {
@@ -512,7 +528,8 @@ dialog.sheet {
   margin: 0;
   width: 100%;
   max-width: 100%;
-  max-height: min(92dvh, 100%);
+  /* A definite cap, so the scroll area inside can shrink to fit. */
+  max-height: 92dvh;
   padding: 0;
   border: 0;
   border-radius: 1.75rem 1.75rem 0 0;
@@ -526,6 +543,11 @@ dialog.sheet {
     opacity 0.35s,
     overlay 0.35s allow-discrete,
     display 0.35s allow-discrete;
+}
+/* Open: a flex column (header, scrolling body, fixed footer). */
+dialog.sheet[open] {
+  display: flex;
+  flex-direction: column;
 }
 dialog.sheet:not([open]) {
   transform: translateY(100%);
@@ -562,6 +584,7 @@ dialog.sheet:not([open])::backdrop {
     margin: auto;
     width: min(40rem, calc(100% - 3rem));
     max-height: min(52rem, calc(100dvh - 3rem));
+    height: fit-content;
     border-radius: 1.75rem;
     opacity: 1;
     transform: none;

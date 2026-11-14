@@ -10,7 +10,8 @@ import type { ThemeConfig } from './types.ts';
  * Tip: a bright accent (lime, yellow, cyan) needs a dark `onAccent`; a deep
  * accent (blue, red, purple) needs a white `onAccent`. `accentText` in each
  * palette is the accent used as text: on the light palette it usually has
- * to be a darker shade of the same colour.
+ * to be a darker shade of the same colour. `selected` fills chosen chips and
+ * tabs (it must stand out 3:1 from the page), `hotText` colours error text.
  */
 export const theme: ThemeConfig = {
   defaultMode: 'dark',
@@ -26,6 +27,9 @@ export const theme: ThemeConfig = {
     text: '#F3F5EF',
     muted: '#A4AAA2',
     accentText: '#D4FF3A',
+    selected: '#D4FF3A',
+    onSelected: '#0B0C0E',
+    hotText: '#FF8A63',
   },
   light: {
     bg: '#F4F4EF',
@@ -35,6 +39,9 @@ export const theme: ThemeConfig = {
     text: '#0D0F11',
     muted: '#53585E',
     accentText: '#456600',
+    selected: '#456600',
+    onSelected: '#FFFFFF',
+    hotText: '#B23A10',
   },
   fonts: {
     arabic: 'Cairo',

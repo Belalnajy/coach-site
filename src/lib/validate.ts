@@ -77,7 +77,7 @@ export const validateConfig = (config: SiteConfig): string[] => {
   } catch {
     fail('coach.ts', 'siteUrl', 'must be a full address like "https://coach.example.com"', coach.siteUrl);
   }
-  for (const key of ['name', 'shortName', 'role', 'headline', 'intro'] as const) text('coach.ts', key, coach[key]);
+  for (const key of ['name', 'shortName', 'title', 'role', 'headline', 'intro'] as const) text('coach.ts', key, coach[key]);
   for (const lang of ['ar', 'en'] as const)
     if (!Array.isArray(coach.story?.[lang]) || coach.story[lang].length === 0 || coach.story[lang].some((p) => !p.trim()))
       fail('coach.ts', `story.${lang}`, 'needs at least one non-empty paragraph');
@@ -136,7 +136,11 @@ export const validateConfig = (config: SiteConfig): string[] => {
         pair(`${mode}.text on ${mode}.${bg}`, p.text, p[bg]);
         pair(`${mode}.muted on ${mode}.${bg}`, p.muted, p[bg]);
         pair(`${mode}.accentText on ${mode}.${bg}`, p.accentText, p[bg]);
+        pair(`${mode}.hotText on ${mode}.${bg}`, p.hotText, p[bg]);
+        // A selected chip or tab has to stand out from what is around it.
+        pair(`${mode}.selected against ${mode}.${bg}`, p.selected, p[bg], 3);
       }
+      pair(`${mode}.onSelected on ${mode}.selected`, p.onSelected, p.selected);
     }
   }
   for (const key of ['arabic', 'latin', 'display'] as const)
@@ -159,7 +163,7 @@ export const validateConfig = (config: SiteConfig): string[] => {
   // packages.ts
   if (config.packages.length === 0) fail('packages.ts', 'packages', 'needs at least one package');
   uniqueIds('packages.ts', config.packages, 'packages');
-  const popular: Record<string, number> = {};
+  let popular = 0;
   config.packages.forEach((p, i) => {
     const at = `packages[${i}]`;
     if (p.kind !== 'online' && p.kind !== 'in-person') fail('packages.ts', `${at}.kind`, 'must be "online" or "in-person"', p.kind);
@@ -170,10 +174,9 @@ export const validateConfig = (config: SiteConfig): string[] => {
       fail('packages.ts', `${at}.price`, 'must be a positive number or "on-request"', p.price);
     if (!Array.isArray(p.features) || p.features.length === 0) fail('packages.ts', `${at}.features`, 'needs at least one item');
     else p.features.forEach((f, j) => text('packages.ts', `${at}.features[${j}]`, f));
-    if (p.popular) popular[p.kind] = (popular[p.kind] ?? 0) + 1;
+    if (p.popular) popular++;
   });
-  for (const [kind, count] of Object.entries(popular))
-    if (count > 1) fail('packages.ts', 'popular', `only one "${kind}" package can be marked popular, ${count} are`);
+  if (popular > 1) fail('packages.ts', 'popular', `only one package on the site can be marked popular, ${popular} are`);
 
   // transformations.ts
   uniqueIds('transformations.ts', config.transformations, 'transformations');
@@ -211,8 +214,9 @@ export const validateConfig = (config: SiteConfig): string[] => {
   uniqueIds('blog.ts', config.blogCategories, 'blogCategories');
   config.blogCategories.forEach((c, i) => text('blog.ts', `blogCategories[${i}].label`, c.label));
 
-  // A real coach's site must not keep made-up results or reviews.
+  // A real coach's site must not keep made-up results, reviews or details.
   if (!coach.sample) {
+    for (const problem of samplePlaceholders(config)) fail(problem.file, problem.path, `still holds the template's sample value; replace it with the coach's own`, problem.value);
     config.transformations.forEach((t, i) => {
       if (t.sample) fail('transformations.ts', `transformations[${i}].sample`, 'coach.sample is false, so made-up stories must be removed or replaced with real ones');
     });
@@ -222,6 +226,40 @@ export const validateConfig = (config: SiteConfig): string[] => {
   }
 
   return errors;
+};
+
+/**
+ * Values that only the template's made-up coach uses. Once `coach.sample`
+ * is false, finding any of them fails the build, so a placeholder phone
+ * number, address or picture cannot go live by accident.
+ */
+export const samplePlaceholders = (config: SiteConfig): { file: string; path: string; value: unknown }[] => {
+  const found: { file: string; path: string; value: unknown }[] = [];
+  const { coach } = config;
+  const flag = (file: string, path: string, value: unknown) => found.push({ file, path, value });
+  const sampleWord = /\(sample\)|\(عيّنة\)|\(عينة\)/i;
+  if (coach.whatsapp === '201000000000') flag('coach.ts', 'whatsapp', coach.whatsapp);
+  if (/(^|[./@])example\.(com|org|net)$|\.example(\.|$)/i.test(new URL(coach.siteUrl, 'https://x.invalid').hostname)) flag('coach.ts', 'siteUrl', coach.siteUrl);
+  if (coach.email && /@(.+\.)?example\.(com|org|net)$/i.test(coach.email)) flag('coach.ts', 'email', coach.email);
+  if (coach.name.en === 'Coach Adam' || coach.name.ar === 'الكابتن آدم') flag('coach.ts', 'name', coach.name);
+  coach.certifications.forEach((c, i) => {
+    if (sampleWord.test(c.name.en) || sampleWord.test(c.name.ar)) flag('coach.ts', `certifications[${i}].name`, c.name.en);
+  });
+  for (const key of ['gym', 'address'] as const)
+    if (sampleWord.test(coach.location[key].en) || sampleWord.test(coach.location[key].ar) || /sample/i.test(coach.location[key].en)) flag('coach.ts', `location.${key}`, coach.location[key].en);
+  for (const [name, href] of Object.entries(coach.socials))
+    if (href && /^https:\/\/(www\.)?[^/]+\/?$/.test(href)) flag('coach.ts', `socials.${name}`, href);
+  const pictures: [string, string, string][] = [
+    ['coach.ts', 'images.hero.src', coach.images.hero.src],
+    ['coach.ts', 'images.portrait.src', coach.images.portrait.src],
+    ['coach.ts', 'images.map.src', coach.images.map.src],
+    ...config.transformations.flatMap((t, i): [string, string, string][] => [
+      ['transformations.ts', `transformations[${i}].before.src`, t.before.src],
+      ['transformations.ts', `transformations[${i}].after.src`, t.after.src],
+    ]),
+  ];
+  for (const [file, path, src] of pictures) if (/\/sample-[^/]*$/.test(src)) flag(file, path, src);
+  return found;
 };
 
 export class ConfigError extends Error {

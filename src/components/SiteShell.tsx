@@ -6,13 +6,14 @@ import Footer from './Footer';
 import Header from './Header';
 import MobileTabBar from './MobileTabBar';
 import { route } from '@/lib/routes';
+import { bookingData } from '@/lib/booking-data';
 import RevealObserver from './RevealObserver';
 
 /** Header, page, footer, phone tab bar and the booking sheet, around every page. */
 export default function SiteShell({ lang, children }: { lang: Locale; children: ReactNode }) {
   const t = dict(lang);
   return (
-    <BookingProvider lang={lang}>
+    <BookingProvider data={bookingData(lang)}>
       <a href="#main" className="sr-only z-50 rounded-full bg-accent px-5 py-3 font-bold text-on-accent focus:not-sr-only focus:fixed focus:start-4 focus:top-3">
         {t.nav.skip}
       </a>

@@ -46,8 +46,14 @@ export interface CoachConfig {
   siteUrl: string;
   /** Full name, e.g. "Coach Adam" / "الكابتن آدم". */
   name: Localized;
-  /** Shortest form, used in the logo and the WhatsApp greeting. */
+  /** Shortest form, used in the WhatsApp greeting. */
   shortName: Localized;
+  /**
+   * How visitors address the coach on its own, in interface text such as
+   * "About the coach" / "عن الكابتن". E.g. { ar: 'الكابتن', en: 'the coach' }
+   * or, for a woman coach, { ar: 'الكوتش', en: 'the coach' }.
+   */
+  title: Localized;
   /** What the coach does, in a few words. */
   role: Localized;
   /** Hero headline. Keep it under ~40 characters per line. */
@@ -114,6 +120,16 @@ export interface Palette {
   muted: string;
   /** The brand colour used as text or icons on this background. */
   accentText: string;
+  /**
+   * Fill of selected chips, tabs and options. Must reach 3:1 against the
+   * page and cards so the selection is visible (WCAG 1.4.11): in the dark
+   * palette this is usually the accent itself, in the light one a deep shade.
+   */
+  selected: string;
+  /** Text on top of `selected`. Must reach 4.5:1. */
+  onSelected: string;
+  /** The warm highlight used as text (error messages, invalid fields). Must reach 4.5:1. */
+  hotText: string;
 }
 
 export interface ThemeConfig {
@@ -156,7 +172,7 @@ export interface PackageConfig {
   per: Localized;
   /** Bullet points of what is included. 3–7 reads best. */
   features: Localized[];
-  /** Shows the "Most popular" tag. At most one per kind. */
+  /** Shows the "Most popular" tag. At most one package on the whole site. */
   popular?: boolean;
 }
 

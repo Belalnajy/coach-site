@@ -8,7 +8,7 @@ import JsonLd from './JsonLd';
 import SiteShell from './SiteShell';
 
 const vars = (p: Palette) =>
-  `--bg:${p.bg};--surface:${p.surface};--surface2:${p.surface2};--line:${p.line};--text:${p.text};--muted:${p.muted};--accent-text:${p.accentText};`;
+  `--bg:${p.bg};--surface:${p.surface};--surface2:${p.surface2};--line:${p.line};--text:${p.text};--muted:${p.muted};--accent-text:${p.accentText};--selected:${p.selected};--on-selected:${p.onSelected};--hot-text:${p.hotText};`;
 
 /**
  * The theme from site.config/theme.ts as CSS variables. Without JavaScript

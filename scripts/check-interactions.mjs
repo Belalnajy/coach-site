@@ -57,6 +57,65 @@ for (const [lang, path, name, expectLines] of [
   await page.close();
 }
 
+// The sheet must scroll with real input, and Send must stay visible and
+// tappable at every phone size (the bug the programmatic clicks above hid).
+for (const [width, path] of [[360, '/'], [390, '/en'], [430, '/'], [390, '/programs']]) {
+  for (const theme of ['dark', 'light']) {
+    const page = await browser.newPage();
+    await page.setViewport({ width, height: width === 360 ? 740 : 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+    await page.evaluateOnNewDocument((m) => {
+      localStorage.setItem('theme', m);
+      window.__opened = [];
+      window.open = (url) => (window.__opened.push(url), {});
+    }, theme);
+    await page.goto(base + path, { waitUntil: 'load' });
+    await sleep(500);
+    const tab = await page.$('nav.fixed a[href*="book"]');
+    const tb = await tab.boundingBox();
+    await page.touchscreen.tap(tb.x + tb.width / 2, tb.y + tb.height / 2);
+    await page.waitForSelector('dialog[open] [data-scroll-area]', { timeout: 5000 });
+    await sleep(600);
+    const inView = (sel) =>
+      page.$eval(sel, (el) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return r.top >= 0 && r.bottom <= innerHeight && (hit === el || el.contains(hit));
+      });
+    assert.ok(await inView('dialog[open] [data-send]'), `${width}px ${theme} ${path}: Send visible and on top when the sheet opens`);
+    // Real touch drag inside the scroll area.
+    const area = await (await page.$('dialog[open] [data-scroll-area]')).boundingBox();
+    const x = area.x + area.width / 2;
+    await page.touchscreen.touchStart(x, area.y + area.height - 40);
+    for (let i = 1; i <= 10; i++) await page.touchscreen.touchMove(x, area.y + area.height - 40 - i * 40);
+    await page.touchscreen.touchEnd();
+    await sleep(700);
+    const afterTouch = await page.$eval('dialog[open] [data-scroll-area]', (el) => el.scrollTop);
+    assert.ok(afterTouch > 100, `${width}px ${theme} ${path}: touch scrolls the sheet (scrollTop ${afterTouch})`);
+    // Wheel scrolling reaches the end of the form.
+    await page.mouse.move(x, area.y + area.height / 2);
+    for (let i = 0; i < 8; i++) await page.mouse.wheel({ deltaY: 500 });
+    await sleep(500);
+    const end = await page.$eval('dialog[open] [data-scroll-area]', (el) => Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < 4);
+    assert.ok(end, `${width}px ${theme} ${path}: wheel scrolls to the end`);
+    assert.ok(await inView('dialog[open] textarea'), `${width}px ${theme} ${path}: the last field is reachable`);
+    // Type a name and tap Send with a real touch.
+    await page.$eval('dialog[open] input[name="name"]', (el) => el.scrollIntoView({ block: 'center' }));
+    await page.type('dialog[open] input[name="name"]', 'Sam');
+    const send = await (await page.$('dialog[open] [data-send]')).boundingBox();
+    await page.touchscreen.tap(send.x + send.width / 2, send.y + send.height / 2);
+    await sleep(300);
+    const [url] = await page.evaluate(() => window.__opened);
+    assert.ok(url?.startsWith('https://wa.me/'), `${width}px ${theme} ${path}: tapping Send opens WhatsApp`);
+    // The close button answers a mouse click on phones too.
+    const close = await (await page.$('dialog[open] button[aria-label]')).boundingBox();
+    await page.mouse.click(close.x + close.width / 2, close.y + close.height / 2);
+    await sleep(500);
+    assert.equal(await page.$('dialog[open]'), null, `${width}px ${theme} ${path}: the close button closes the sheet on click`);
+    await page.close();
+  }
+}
+console.log('✓ booking sheet: touch and wheel scroll, Send always visible and tappable, close by click (360/390/430, both themes, both languages)');
+
 for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight'], ['ar', '/transformations', 'ArrowLeft']]) {
   const page = await phone(path);
   const slider = await page.$('[role="slider"]');

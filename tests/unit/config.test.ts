@@ -49,20 +49,60 @@ test('a broken config fails with messages that name the file and the field', () 
   assert.throws(() => assertValidConfig(bad), (e: unknown) => e instanceof ConfigError && /problems:/.test(e.message));
 });
 
-test('a real coach cannot ship the sample stories and reviews', () => {
+test('a real coach cannot ship the sample stories, reviews or placeholder details', () => {
   const live = clone();
   live.coach.sample = false;
   const errors = validateConfig(live);
-  assert.ok(errors.some((e) => e.startsWith('site.config/transformations.ts → transformations[0].sample')));
-  assert.ok(errors.some((e) => e.startsWith('site.config/testimonials.ts → testimonials[0].sample')));
+  const has = (prefix: string) => assert.ok(errors.some((e) => e.startsWith(prefix)), `expected an error starting with ${prefix}\n${errors.join('\n')}`);
+  has('site.config/transformations.ts → transformations[0].sample');
+  has('site.config/testimonials.ts → testimonials[0].sample');
+  has('site.config/coach.ts → whatsapp: still holds the template');
+  has('site.config/coach.ts → siteUrl: still holds the template');
+  has('site.config/coach.ts → email: still holds the template');
+  has('site.config/coach.ts → name: still holds the template');
+  has('site.config/coach.ts → certifications[0].name: still holds the template');
+  has('site.config/coach.ts → location.gym: still holds the template');
+  has('site.config/coach.ts → socials.instagram: still holds the template');
+  has('site.config/transformations.ts → transformations[0].before.src: still holds the template');
 });
 
-test('only one popular package per kind, and a bad colour is reported', () => {
+test('a real coach with real details passes the placeholder guard', () => {
+  const live = clone();
+  live.coach.sample = false;
+  live.coach.whatsapp = '201112223334';
+  live.coach.siteUrl = 'https://coach-salma.com';
+  live.coach.email = 'hi@coach-salma.com';
+  live.coach.name = { ar: 'الكوتش سلمى', en: 'Coach Salma' };
+  live.coach.certifications = [{ name: { ar: 'مدربة معتمدة', en: 'Certified trainer' }, issuer: { ar: 'جهة', en: 'Body' }, year: 2020 }];
+  live.coach.location.gym = { ar: 'جيم النخبة', en: 'Elite Gym' };
+  live.coach.location.address = { ar: 'شارع التسعين', en: '90th Street' };
+  live.coach.socials = { instagram: 'https://instagram.com/coach.salma' };
+  live.transformations = live.transformations.slice(0, 1).map((t) => ({
+    ...t,
+    sample: false,
+    before: { ...t.before, src: '/images/transformations/salma-01-before.webp' },
+    after: { ...t.after, src: '/images/transformations/salma-01-after.webp' },
+  }));
+  live.testimonials = live.testimonials.map((t) => ({ ...t, sample: false }));
+  assert.deepEqual(validateConfig(live), []);
+});
+
+test('light palette: selections and error text are readable', () => {
   const bad = clone();
-  bad.packages.forEach((p) => (p.popular = true));
+  bad.theme.light.selected = bad.theme.accent; // lime on a light page
+  bad.theme.light.hotText = bad.theme.hot;
+  const errors = validateConfig(bad);
+  assert.ok(errors.some((e) => e.includes('light.selected against light.surface: is too hard to read')));
+  assert.ok(errors.some((e) => e.includes('light.hotText on light.surface: is too hard to read')));
+});
+
+test('only one popular package on the whole site, and a bad colour is reported', () => {
+  assert.equal(site.packages.filter((p) => p.popular).length, 1, 'the sample marks exactly one package');
+  const bad = clone();
+  bad.packages[3].popular = true;
   bad.theme.accent = 'lime';
   const errors = validateConfig(bad);
-  assert.ok(errors.some((e) => e.includes('only one "online" package can be marked popular')));
+  assert.ok(errors.some((e) => e.includes('only one package on the site can be marked popular, 2 are')));
   assert.ok(errors.some((e) => e.includes('theme.ts → accent: must be a colour written as #rrggbb (found "lime")')));
 });
 

@@ -1,10 +1,14 @@
-import type { Locale } from '../../site.config/types.ts';
-import { dict, fill } from './i18n.ts';
+import type { Dict } from '../locales/ar.ts';
+import { fill } from './fill.ts';
+
+/** The message's own words, from the page's dictionary (dict(lang).message). */
+export type MessageStrings = Dict['message'];
 
 /**
  * Builds the booking message and the wa.me link. Pure functions: the form
- * resolves ids to labels and passes plain text in, so this can be tested
- * without the config.
+ * resolves ids to labels and passes plain text and the dictionary's message
+ * strings in, so this runs in the browser without the config or the
+ * dictionaries, and can be tested on its own.
  *
  * WhatsApp renders *text* as bold. User-typed text is cleaned of the
  * characters that would break that formatting or the layout (asterisks,
@@ -12,7 +16,8 @@ import { dict, fill } from './i18n.ts';
  */
 
 export interface BookingMessageInput {
-  lang: Locale;
+  /** dict(lang).message: greeting, labels and fallbacks in the page's language. */
+  strings: MessageStrings;
   /** Short name used in the greeting, e.g. "Adam" / "كابتن آدم". */
   coachName: string;
   name: string;
@@ -52,7 +57,7 @@ export const cleanNote = (value: string): string =>
     .slice(0, MAX_NOTE);
 
 export const buildBookingMessage = (input: BookingMessageInput): string => {
-  const m = dict(input.lang).message;
+  const m = input.strings;
   const row = (label: string, value: string) => `*${label}:* ${value}`;
   const pkg = input.packageName
     ? input.packagePrice

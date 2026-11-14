@@ -7,7 +7,7 @@ import type { PackageConfig } from './types.ts';
  *
  * - `kind`: "in-person" (in the gym) or "online".
  * - `price`: a number in the currency set in coach.ts, or "on-request".
- * - `popular: true` adds a "Most popular" tag (one per kind at most).
+ * - `popular: true` adds a "Most popular" tag (one package on the whole site).
  * - The order here is the order on the site.
  */
 export const packages: PackageConfig[] = [
@@ -79,7 +79,6 @@ export const packages: PackageConfig[] = [
       { ar: 'خطة أكل مع المتابعة', en: 'Nutrition plan included' },
       { ar: 'برنامج للأيام التي تتمرن فيها وحدك', en: 'A plan for the days you train alone' },
     ],
-    popular: true,
   },
   {
     id: 'small-group',

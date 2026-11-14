@@ -13,6 +13,8 @@ export const coach: CoachConfig = {
 
   name: { ar: 'الكابتن آدم', en: 'Coach Adam' },
   shortName: { ar: 'كابتن آدم', en: 'Adam' },
+  // How the interface refers to the coach ("عن الكابتن" / "About the coach").
+  title: { ar: 'الكابتن', en: 'the coach' },
   role: {
     ar: 'مدرب لياقة وقوة ونحت جسم',
     en: 'Strength & body recomposition coach',

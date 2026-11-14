@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import type { Locale } from '@/lib/i18n';
+import type { BookingData } from '@/lib/booking-data';
 
 /** What a "Book" button can pre-fill in the form. */
 export interface BookingPreset {
@@ -28,7 +28,7 @@ const BookingSheet = dynamic(loadSheet, { ssr: false });
  * Lets every "Book" button on every page open the same booking sheet.
  * Without JavaScript the buttons are plain links to the /book page.
  */
-export default function BookingProvider({ lang, children }: { lang: Locale; children: ReactNode }) {
+export default function BookingProvider({ data, children }: { data: BookingData; children: ReactNode }) {
   const [state, setState] = useState<{ open: boolean; preset: BookingPreset; key: number } | null>(null);
   const openBooking = useCallback((preset: BookingPreset = {}) => setState((s) => ({ open: true, preset, key: (s?.key ?? 0) + 1 })), []);
   const close = useCallback(() => setState((s) => (s ? { ...s, open: false } : s)), []);
@@ -36,7 +36,7 @@ export default function BookingProvider({ lang, children }: { lang: Locale; chil
   return (
     <BookingContext.Provider value={value}>
       {children}
-      {state && <BookingSheet lang={lang} open={state.open} preset={state.preset} formKey={state.key} onClose={close} />}
+      {state && <BookingSheet data={data} open={state.open} preset={state.preset} formKey={state.key} onClose={close} />}
     </BookingContext.Provider>
   );
 }
