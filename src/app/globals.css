@@ -113,6 +113,13 @@
     font-variant-numeric: tabular-nums;
     letter-spacing: 0;
   }
+  /* In Arabic, words inside a number ("‎−14 كجم") fall back to Cairo, which
+     has no italic: asking for normal keeps them upright instead of slanted
+     by the browser. The digits stay italic, because the display face is
+     only loaded in its italic cut. */
+  :lang(ar) .num {
+    font-style: normal;
+  }
 
   .eyebrow {
     display: inline-flex;

@@ -32,30 +32,26 @@ const LINKS: { key: RouteKey; icon: 'home' | 'dumbbell' | 'results' | 'calculato
   { key: 'blog', icon: 'article' },
 ];
 
+/**
+ * One H1 holding both languages' titles: the one for the other language is
+ * hidden (display: none), so the page has exactly one heading and screen
+ * readers hear only the visible language.
+ */
 function Version({ lang }: { lang: Locale }) {
   const t = dict(lang);
   return (
     <div className={`nf-${lang} ${FONT_CLASSES_404[lang]} font-sans`} lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      <header className="container-x flex h-16 items-center">
-        <Logo lang={lang} />
-      </header>
-      <main className="container-x flex min-h-[80svh] flex-col items-center justify-center py-16 text-center">
-        <p className="num text-[9rem] leading-none text-accent-text sm:text-[13rem]" aria-hidden="true">
-          {t.notFound.code}
-        </p>
-        <h1 className="display mt-4 max-w-2xl text-4xl text-balance sm:text-5xl">{t.notFound.title}</h1>
-        <p className="mt-4 max-w-md text-muted">{t.notFound.text}</p>
-        <ul className="mt-8 flex flex-wrap justify-center gap-2">
-          {LINKS.map(({ key, icon }) => (
-            <li key={key}>
-              <Link href={route(lang, key)} className={key === 'home' ? 'btn btn-primary' : 'btn btn-ghost'}>
-                <Icon name={icon} size={18} />
-                {key === 'home' ? t.notFound.home : t.nav[key as Exclude<RouteKey, 'home' | 'book'>]}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </main>
+      <p className="mt-4 max-w-md text-muted">{t.notFound.text}</p>
+      <ul className="mt-8 flex flex-wrap justify-center gap-2">
+        {LINKS.map(({ key, icon }) => (
+          <li key={key}>
+            <Link href={route(lang, key)} className={key === 'home' ? 'btn btn-primary' : 'btn btn-ghost'}>
+              <Icon name={icon} size={18} />
+              {key === 'home' ? t.notFound.home : t.nav[key as Exclude<RouteKey, 'home' | 'book'>]}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -68,8 +64,27 @@ export default function GlobalNotFound() {
         <style dangerouslySetInnerHTML={{ __html: `${THEME_CSS}\nhtml[lang=en] .nf-ar,html[lang=ar] .nf-en{display:none}` }} />
       </head>
       <body className="antialiased">
-        <Version lang="ar" />
-        <Version lang="en" />
+        <header className="container-x flex h-16 items-center">
+          {(['ar', 'en'] as const).map((lang) => (
+            <div key={lang} className={`nf-${lang} ${FONT_CLASSES_404[lang]} font-sans`} lang={lang}>
+              <Logo lang={lang} />
+            </div>
+          ))}
+        </header>
+        <main className="container-x flex min-h-[80svh] flex-col items-center justify-center py-16 text-center">
+          <p className="num text-[9rem] leading-none text-accent-text sm:text-[13rem]" aria-hidden="true">
+            404
+          </p>
+          <h1 className="display mt-4 max-w-2xl text-4xl text-balance sm:text-5xl">
+            {(['ar', 'en'] as const).map((lang) => (
+              <span key={lang} className={`nf-${lang} ${FONT_CLASSES_404[lang]} block font-sans`} lang={lang}>
+                {dict(lang).notFound.title}
+              </span>
+            ))}
+          </h1>
+          <Version lang="ar" />
+          <Version lang="en" />
+        </main>
       </body>
     </html>
   );

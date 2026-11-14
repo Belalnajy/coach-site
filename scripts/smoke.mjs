@@ -9,6 +9,7 @@
  */
 import { spawn, execSync } from 'node:child_process';
 import { ROUTE_PATHS } from './routes.mjs';
+import { coach } from '../site.config/coach.ts';
 
 const PORT = Number(process.env.SMOKE_PORT || 4501);
 const base = `http://127.0.0.1:${PORT}`;
@@ -55,6 +56,9 @@ try {
       if (!/hreflang="ar"/i.test(html) || !/hreflang="en"/i.test(html)) return 'missing hreflang alternates';
       if (!html.includes('og:image')) return 'missing share image';
       if ((html.match(/<h1[\s>]/g) || []).length !== 1) return 'expected exactly one <h1>';
+      // The template's sample coach: hidden from search, no fake business data.
+      if (coach.sample && !html.includes('<meta name="robots" content="noindex, nofollow"/>')) return 'sample content must be noindex';
+      if (coach.sample && /"@type":"(SportsActivityLocation|OfferCatalog)"|"telephone"|"jobTitle"/.test(html)) return 'sample content must not publish person/business structured data';
       return null;
     });
   }

@@ -18,7 +18,22 @@ const ids = {
 
 const sameAs = Object.values(coach.socials).filter(Boolean);
 
-export const siteJsonLd = (lang: Locale) => {
+/**
+ * While the site shows sample content (coach.sample), only the WebSite entry
+ * is published: no person, phone number, gym, address or prices that do not
+ * exist. `sample` is a parameter so tests can check both cases.
+ */
+export const siteJsonLd = (lang: Locale, sample = coach.sample) => {
+  const website = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': ids.website,
+    name: coach.name[lang],
+    url: absolute(lang, '/'),
+    inLanguage: lang,
+    ...(sample ? {} : { publisher: { '@id': ids.person } }),
+  };
+  if (sample) return [website];
   const priced = packages.filter((p) => p.price !== 'on-request').map((p) => p.price as number);
   return [
     {
@@ -63,29 +78,26 @@ export const siteJsonLd = (lang: Locale) => {
       founder: { '@id': ids.person },
       ...(sameAs.length ? { sameAs } : {}),
     },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      '@id': ids.website,
-      name: coach.name[lang],
-      url: absolute(lang, '/'),
-      inLanguage: lang,
-      publisher: { '@id': ids.person },
-    },
+    website,
   ];
 };
 
-export const faqJsonLd = (lang: Locale) => ({
+/** Nothing when the FAQ is empty (an empty FAQPage is invalid structured data). */
+export const faqJsonLd = (lang: Locale) =>
+  faq.length === 0
+    ? null
+    : {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: faq.map((f) => ({
-    '@type': 'Question',
-    name: f.question[lang],
-    acceptedAnswer: { '@type': 'Answer', text: f.answer[lang] },
-  })),
-});
+        mainEntity: faq.map((f) => ({
+          '@type': 'Question',
+          name: f.question[lang],
+          acceptedAnswer: { '@type': 'Answer', text: f.answer[lang] },
+        })),
+      };
 
-export const offersJsonLd = (lang: Locale) => ({
+/** The packages as offers; nothing while the prices are the template's samples. */
+export const offersJsonLd = (lang: Locale, sample = coach.sample) => sample ? null : ({
   '@context': 'https://schema.org',
   '@type': 'Service',
   name: coach.role[lang],
@@ -120,8 +132,8 @@ export const articleJsonLd = (lang: Locale, post: Post) => ({
   dateModified: post.date,
   inLanguage: lang,
   mainEntityOfPage: absolute(lang, `/blog/${post.slug}`),
-  author: { '@id': ids.person, '@type': 'Person', name: coach.name[lang], url: absolute(lang, '/about') },
-  publisher: { '@id': ids.person },
+  author: coach.sample ? { '@type': 'Person', name: coach.name[lang] } : { '@id': ids.person, '@type': 'Person', name: coach.name[lang], url: absolute(lang, '/about') },
+  ...(coach.sample ? {} : { publisher: { '@id': ids.person } }),
   timeRequired: `PT${post.minutes[lang]}M`,
 });
 

@@ -4,6 +4,7 @@ import { dict, fill } from '@/lib/i18n';
 import { coach } from '@/lib/config';
 import { route } from '@/lib/routes';
 import { whatsappUrl } from '@/lib/whatsapp';
+import EmailText from './EmailText';
 import Icon from './Icon';
 import Logo from './Logo';
 import { NAV } from './nav';
@@ -48,9 +49,9 @@ export default function Footer({ lang }: { lang: Locale }) {
             </li>
             {coach.email && (
               <li>
-                <a href={`mailto:${coach.email}`} className="inline-flex min-h-11 items-center gap-2 font-semibold break-all hover:text-accent-text">
+                <a href={`mailto:${coach.email}`} className="inline-flex min-h-11 items-center gap-2 font-semibold hover:text-accent-text">
                   <Icon name="mail" size={18} />
-                  {coach.email}
+                  <EmailText email={coach.email} />
                 </a>
               </li>
             )}

@@ -179,5 +179,37 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
   await page.close();
 }
 
+{
+  // The language switch keeps the query and the hash.
+  const page = await phone('/book?package=pt-12');
+  await page.click('button[aria-haspopup="dialog"]');
+  await sleep(500);
+  const href = await page.$eval('dialog[open] a[hreflang="en"]', (el) => el.getAttribute('href'));
+  assert.equal(href, '/en/book?package=pt-12');
+  await page.goto(base + '/en/calculators#bmi', { waitUntil: 'load' });
+  await sleep(400);
+  await page.click('button[aria-haspopup="dialog"]');
+  await sleep(500);
+  assert.equal(await page.$eval('dialog[open] a[hreflang="ar"]', (el) => el.getAttribute('href')), '/calculators#bmi');
+  console.log('✓ language switch keeps ?query and #hash');
+  await page.close();
+}
+
+{
+  // Home: one call to action on the first screen. The tab bar's Book is a
+  // plain tab while the hero button shows, and rises once it scrolls away.
+  const page = await phone('/en');
+  const raised = () => page.$eval('nav.fixed a[href*="book"] > span', (el) => el.classList.contains('pulse-ring'));
+  assert.equal(await raised(), false, 'calm while the hero CTA is visible');
+  await page.evaluate(() => window.scrollTo(0, 1400));
+  await sleep(600);
+  assert.equal(await raised(), true, 'raised once the hero CTA is gone');
+  await page.goto(base + '/en/programs', { waitUntil: 'load' });
+  await sleep(500);
+  assert.equal(await raised(), true, 'raised on pages without a hero CTA');
+  console.log('✓ tab bar Book: calm under the hero button, raised elsewhere');
+  await page.close();
+}
+
 await browser.close();
 console.log('Interactions OK');

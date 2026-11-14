@@ -33,5 +33,3 @@ export const basePath = (pathname: string): string => {
 
 /** The same page in the other language. */
 export const twinPath = (pathname: string, to: Locale): string => href(to, basePath(pathname));
-
-export const langOf = (pathname: string): Locale => (pathname === '/en' || pathname.startsWith('/en/') ? 'en' : 'ar');

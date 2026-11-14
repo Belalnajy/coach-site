@@ -6,6 +6,7 @@ import { whatsappUrl } from '@/lib/whatsapp';
 import { bookingData } from '@/lib/booking-data';
 import BookingForm from '../BookingForm';
 import BookingPageForm from '../BookingPageForm';
+import EmailText from '../EmailText';
 import Icon from '../Icon';
 import PageHeader from '../PageHeader';
 
@@ -47,9 +48,9 @@ export default function BookPage({ lang }: { lang: Locale }) {
               </li>
               {coach.email && (
                 <li>
-                  <a href={`mailto:${coach.email}`} className="inline-flex min-h-11 items-center gap-2 font-semibold break-all hover:text-accent-text">
+                  <a href={`mailto:${coach.email}`} className="inline-flex min-h-11 items-center gap-2 font-semibold hover:text-accent-text">
                     <Icon name="mail" size={20} />
-                    {coach.email}
+                    <EmailText email={coach.email} />
                   </a>
                 </li>
               )}

@@ -1,5 +1,5 @@
 import * as site from '../../site.config/index.ts';
-import type { Locale, PackageConfig } from '../../site.config/types.ts';
+import type { Locale } from '../../site.config/types.ts';
 import { assertValidConfig } from './validate.ts';
 
 /**
@@ -11,11 +11,5 @@ assertValidConfig(site);
 
 export const { coach, theme, booking, packages, transformations, testimonials, faq, blogCategories } = site;
 
-export const packageById = (id: string | null | undefined): PackageConfig | undefined =>
-  id ? packages.find((p) => p.id === id) : undefined;
-
 export const goalLabel = (id: string, lang: Locale): string =>
   booking.goals.find((g) => g.id === id)?.label[lang] ?? id;
-
-export const slotLabel = (id: string, lang: Locale): string =>
-  booking.slots.find((s) => s.id === id)?.label[lang] ?? id;

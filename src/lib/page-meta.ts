@@ -15,6 +15,8 @@ export const rootMetadata = (lang: Locale): Metadata => ({
   authors: [{ name: coach.name[lang] }],
   formatDetection: { telephone: false },
   appleWebApp: { capable: true, title: coach.shortName[lang], statusBarStyle: 'black-translucent' },
+  // The template's made-up coach must never show up in search results.
+  ...(coach.sample ? { robots: { index: false, follow: false } } : {}),
 });
 
 export const rootViewport: Viewport = {

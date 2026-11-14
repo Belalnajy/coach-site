@@ -62,7 +62,7 @@ function Hero({ lang }: { lang: Locale }) {
             ))}
           </h1>
           <p className="mt-4 max-w-xl text-[0.95rem] text-pretty text-muted md:text-xl">{coach.intro[lang]}</p>
-          <div className="mt-6 flex gap-2.5 sm:gap-3 lg:mt-8">
+          <div className="mt-6 flex gap-2.5 sm:gap-3 lg:mt-8" data-hero-cta>
             <BookLink lang={lang} className="btn btn-primary btn-lg flex-1 sm:flex-none">
               <Icon name="whatsapp" size={22} />
               {t.home.primaryCta}
