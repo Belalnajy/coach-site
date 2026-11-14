@@ -1,4 +1,4 @@
-# Coach Site — website template for a personal fitness coach
+# Coach Site — Coach Mohamed Nasser (built on the coach-site template)
 
 [English](#english) · [العربية](#العربية)
 
@@ -8,7 +8,9 @@
 
 A fast, bilingual website for a personal trainer: Arabic first (right-to-left, at `/`) and English at `/en`. Visitors book on **WhatsApp** through a short form that writes the message for them; there is no database and no backend. Everything that identifies the coach lives in one folder, **`site.config/`**, so a new client is a content change, not a code change.
 
-> **Sample content.** The template ships with a made-up coach, "Coach Adam / الكابتن آدم". His clients, results, reviews, certifications, prices and phone number are fictional, and every picture is generated artwork, not a photo of a real person. Stories and reviews carry a visible "Sample" badge and the footer says the site shows sample content until `coach.sample` is set to `false`. Replace everything with the real coach's material, and publish client photos and reviews **only with the client's written consent**.
+> **Branches.** `main` is the live site of **Coach Mohamed Nasser** (`sample: false`). The reusable template, with the made-up sample coach and generated artwork, is on the **`template`** branch: start a new client from there (`git checkout template`, then follow the setup below).
+
+> **On the `template` branch: sample content.** The template ships with a made-up coach, "Coach Adam / الكابتن آدم". His clients, results, reviews, certifications, prices and phone number are fictional, and every picture is generated artwork, not a photo of a real person. Stories and reviews carry a visible "Sample" badge and the footer says the site shows sample content until `coach.sample` is set to `false`. Replace everything with the real coach's material, and publish client photos and reviews **only with the client's written consent**.
 
 ### What's inside
 
@@ -24,6 +26,28 @@ A fast, bilingual website for a personal trainer: Arabic first (right-to-left, a
 | 404 | any unknown address | In Arabic, or English under `/en` |
 
 Also: dark and light themes, a phone tab bar with a central Book button, share images for every page in both languages, `sitemap.xml` with hreflang, `robots.txt`, a web manifest, and JSON-LD (Person, SportsActivityLocation, FAQPage, Offer catalogue, BlogPosting, breadcrumbs).
+
+### Launch with what you have: sections hide themselves
+
+Only `name`, `title`, `role`, `headline`, `intro`, `whatsapp`, the two pictures, the packages and the booking options are required. Everything else is optional, and a section with no content is not shown, together with its menu entry, home block, sitemap entry and structured data:
+
+| Leave it out or empty | What disappears |
+| --- | --- |
+| `transformations` (empty list) | Results page, its menu and tab-bar entries, the home results block |
+| `testimonials`, `faq` | The reviews block, the FAQ (and its FAQPage data) |
+| `coach.stats` (each number) | That number in the proof row; the row itself when none is set |
+| `coach.story`, `principles`, `certifications`, `achievements` | Those blocks on About (and the home highlight for achievements) |
+| `coach.location` | The gym card and address; structured data becomes a Person only |
+| `coach.socials`, `coach.email` | Social icons, email links |
+| `coach.promises` (`replyTime`, `steps`, `afterBooking`, `guarantee`) | The hero's reply-time note, "How we start", "What happens next?", the guarantee card |
+
+Never fill these with guesses about a real person: the validator accepts them missing, checks whatever is there, and with `sample: false` refuses any value left over from the template's made-up coach.
+
+**Feature switches** live in `site.config/features.ts`: `blog: false` removes the blog pages, menu entry and sitemap entries (articles read as written by the coach, so keep it off until he approves them).
+
+**Site address.** On Vercel it comes from the project's production domain (`VERCEL_PROJECT_PRODUCTION_URL`, set by Vercel at build time); `SITE_URL` overrides it (a custom domain, or `SITE_URL=http://localhost:4500` for a local build); otherwise `coach.siteUrl` is the fallback.
+
+**Photos from the coach.** `scripts/coach-photo.mjs` turns the coach's original photo (in `assets-src/`, not published) into the hero and portrait: 4:5 crops, a black-and-white grade, the background blurred and darkened behind a hand-traced outline, lime rim light and grain, with his face and body unchanged. `scripts/client-photos.mjs` crops client before/after screenshots (kept on the owner's machine in `assets-src/clients/`, which git ignores because the screenshots show other people's names) into 4:5 pairs, one per view (front, side, back). Each pair is exported at the same size and never upscaled.
 
 ### Set up a new coach in under 30 minutes
 
@@ -184,6 +208,16 @@ npm run dev
 ### الفحوصات
 
 `npm run lint` (بدون أي تحذير) · `npm test` (اختبارات الحاسبات ورسالة واتساب والإعدادات) · `npm run smoke` (بناء وفحص كل الصفحات باللغتين) · `npm run check:layout` و `npm run check:interactions` و `npm run lighthouse` (على نسخة تعمل على المنفذ 4500).
+
+### أقسام تختفي وحدها
+
+الحقول الإلزامية قليلة: الاسم واللقب والتخصص والعنوان الرئيسي والنبذة ورقم واتساب والصورتان والباقات وخيارات الحجز. كل ما عدا ذلك اختياري، وأي قسم بلا محتوى لا يظهر، ومعه رابطه في القائمة وكتلته في الرئيسية وخريطة الموقع والبيانات المنظمة: النتائج (إذا كانت القائمة فارغة)، والآراء، والأسئلة الشائعة، والأرقام، والقصة، والشهادات، والإنجازات، والجيم، والحسابات، والوعود (مدة الرد، خطوات البدء، ما بعد الحجز، الضمان). لا تملأها أبداً بتخمين عن شخص حقيقي.
+
+**مفاتيح الأقسام** في `site.config/features.ts`: `blog: false` يخفي المدونة بالكامل.
+
+**عنوان الموقع** يُحسب وقت البناء على Vercel من `VERCEL_PROJECT_PRODUCTION_URL`، ويمكن تجاوزه بـ `SITE_URL`.
+
+**الفروع:** `main` هو موقع الكابتن محمد ناصر، والقالب بمحتواه التجريبي على فرع `template`.
 
 ### ما يجب استبداله
 
