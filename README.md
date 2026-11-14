@@ -61,7 +61,7 @@ Replace the files and keep the names and sizes (or change the path and size in t
 | `public/images/transformations/<id>-before.webp` / `-after.webp` | 1000 × 1250 (4:5) | Before/after pairs. Same spot, distance, pose and light, so the slider lines up |
 | `public/images/blog/<slug>.webp` | 1600 × 900 (16:9) | Article covers |
 
-WebP or JPG at about 80% quality is plenty; the site resizes them for each screen. `npm run images` regenerates the sample artwork.
+WebP or JPG at about 80% quality is plenty; the site resizes them for each screen. `npm run images` regenerates the sample artwork. If you replace a picture while a local `npm start` has already served it, delete `.next/cache/images` to see the new one (Vercel starts fresh on every deploy).
 
 #### Colours and fonts
 
