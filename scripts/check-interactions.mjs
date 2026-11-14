@@ -146,6 +146,9 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
   // Stories with several views switch angle and keep the divider where it is.
   const angles = await page.$$('article [role="group"] button[aria-pressed]');
   if (angles.length > 1) {
+    // Centred first, so the fixed tab bar is not over it.
+    await angles[1].evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await sleep(200);
     await angles[1].click();
     await sleep(300);
     const srcs = await page.$eval('article', (el) => [...el.querySelectorAll('img')].map((i) => i.getAttribute('src')).join(' '));
@@ -154,6 +157,74 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     console.log(`✓ ${lang}: angle buttons switch views`);
   }
   await page.close();
+}
+
+// Every slider starts with its handle in the middle: on the home rail (cards
+// off screen sideways) and on the results page, at 390 and 360, in both
+// languages, before and after a resize. A finger swipe on a picture in the
+// rail scrolls the rail and leaves the handle alone.
+{
+  const handles = (page) =>
+    page.$$eval('[data-ba-divider]', (els) =>
+      els.map((el) => {
+        const frame = el.parentElement.getBoundingClientRect();
+        const r = el.getBoundingClientRect();
+        return Math.round((((r.left + r.width / 2 - frame.left) / frame.width) * 1000)) / 10;
+      }),
+    );
+  for (const [w, h] of [[390, 844], [360, 780]])
+    for (const path of ['/', '/en', '/transformations', '/en/transformations']) {
+      const page = await browser.newPage();
+      await page.setViewport({ width: w, height: h, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
+      await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+      await page.goto(base + path, { waitUntil: 'load' });
+      await sleep(500);
+      const at = await handles(page);
+      assert.ok(at.length >= 3, `${path}: sliders found`);
+      at.forEach((p, i) => assert.ok(Math.abs(p - 50) < 1, `${path} @${w}: card ${i + 1} handle at ${p}% (expected 50%)`));
+      await page.setViewport({ width: h, height: w, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
+      await sleep(300);
+      (await handles(page)).forEach((p, i) => assert.ok(Math.abs(p - 50) < 1, `${path} rotated: card ${i + 1} handle at ${p}%`));
+      await page.close();
+    }
+  for (const path of ['/', '/en']) {
+    const page = await phone(path);
+    // Without the first card's intro nudge, which moves the handle on purpose.
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await page.reload({ waitUntil: 'load' });
+    await sleep(500);
+    await page.$eval('[data-ba-divider]', (el) => el.closest('ul').scrollIntoView({ block: 'center' }));
+    await sleep(400);
+    const rail = await page.$('[data-ba-divider]').then((h) => h.evaluateHandle((el) => el.closest('ul')));
+    const before = await rail.evaluate((el) => el.scrollLeft);
+    const pic = await page.$$eval('[data-ba-divider]', (els) => {
+      const r = els[0].parentElement.getBoundingClientRect();
+      return { x: r.left + r.width * 0.2, y: r.top + r.height * 0.5, w: r.width };
+    });
+    const dir = path === '/' ? 1 : -1; // towards the next card
+    await page.touchscreen.touchStart(pic.x + (dir > 0 ? 0 : pic.w * 0.6), pic.y);
+    for (let i = 1; i <= 8; i++) await page.touchscreen.touchMove(pic.x + (dir > 0 ? 0 : pic.w * 0.6) + dir * i * 25, pic.y + 2);
+    await page.touchscreen.touchEnd();
+    await sleep(700);
+    const after = await rail.evaluate((el) => el.scrollLeft);
+    assert.ok(Math.abs(after - before) > 40, `${path}: a swipe on a picture scrolls the rail (${before} → ${after})`);
+    (await handles(page)).forEach((p, i) => assert.ok(Math.abs(p - 50) < 1, `${path}: after the swipe, card ${i + 1} handle stays at 50% (${p}%)`));
+    // A finger on the handle itself does move it.
+    const knob = await page.$$eval('[data-ba-divider]', (els) => {
+      const el = els.find((e) => { const r = e.getBoundingClientRect(); return r.left > 0 && r.right < innerWidth; });
+      const r = el.getBoundingClientRect();
+      const f = el.parentElement.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: f.top + f.height / 2, w: f.width, i: els.indexOf(el) };
+    });
+    await page.touchscreen.touchStart(knob.x, knob.y);
+    for (let i = 1; i <= 6; i++) await page.touchscreen.touchMove(knob.x + i * knob.w * 0.04, knob.y);
+    await page.touchscreen.touchEnd();
+    await sleep(300);
+    const moved = (await handles(page))[knob.i];
+    assert.ok(Math.abs(moved - 74) < 4, `${path}: dragging the handle by a finger moves it (now ${moved}%)`);
+    await page.close();
+  }
+  console.log('✓ sliders: every handle starts at 50% (390/360, rotated, AR/EN, rail and grid); swipes scroll the rail');
 }
 
 {

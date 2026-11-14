@@ -15,11 +15,17 @@ for (const spec of shots) {
   const phone = w < 800;
   const page = await browser.newPage();
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
-  await page.setViewport({ width: w, height: phone ? 844 : 900, deviceScaleFactor: phone ? 2 : 1, isMobile: phone, hasTouch: phone });
+  await page.setViewport({ width: w, height: phone ? (w === 360 ? 780 : 844) : 900, deviceScaleFactor: phone ? 2 : 1, isMobile: phone, hasTouch: phone });
   await page.evaluateOnNewDocument((m) => localStorage.setItem('theme', m), mode);
   await page.goto(base + path, { waitUntil: 'load', timeout: 60000 });
   await new Promise((r) => setTimeout(r, 800));
   await page.evaluate(() => document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible')));
+  if (/^angle\d$/.test(action)) {
+    // Switch every multi-angle card to its n-th view (cards without one keep theirs).
+    const n = Number(action.slice(5)) - 1;
+    await page.$$eval('article [role="group"]', (groups, i) => groups.forEach((g) => g.querySelectorAll('button')[i]?.click()), n);
+    await new Promise((r) => setTimeout(r, 800));
+  }
   if (action === 'drag') {
     // A before/after slider caught mid-drag (pointer still down).
     await page.$eval('[role="slider"]', (el) => el.closest('article').scrollIntoView({ block: 'center' }));
@@ -78,7 +84,7 @@ for (const spec of shots) {
     // Phones: screen-by-screen captures stitched side by side (a full-page
     // capture resizes the viewport, which distorts svh-based layouts).
     const total = await page.evaluate(() => document.documentElement.scrollHeight);
-    const step = 844 - 120;
+    const step = (w === 360 ? 780 : 844) - 120;
     const shots = [];
     for (let y = 0; y < total - 200 && shots.length < 16; y += step) {
       await page.evaluate((top) => window.scrollTo(0, top), y);
@@ -89,8 +95,8 @@ for (const spec of shots) {
     const sharp = (await import('sharp')).default;
     for (let s = 0; s * 4 < shots.length; s++) {
       const group = shots.slice(s * 4, s * 4 + 4);
-      await sharp({ create: { width: group.length * (780 + 16), height: 1688, channels: 3, background: '#ff00ff' } })
-        .composite(group.map((input, i) => ({ input, left: i * 796, top: 0 })))
+      await sharp({ create: { width: group.length * (w * 2 + 16), height: (w === 360 ? 780 : 844) * 2, channels: 3, background: '#ff00ff' } })
+        .composite(group.map((input, i) => ({ input, left: i * (w * 2 + 16), top: 0 })))
         .png()
         .toFile(`.screens/${name}-${s}.png`);
       console.log(`.screens/${name}-${s}.png`);
