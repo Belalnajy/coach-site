@@ -65,8 +65,8 @@ export const coach: CoachConfig = {
   images: {
     hero: {
       src: '/images/coach/mohamed-nasser-hero.webp',
-      width: 768,
-      height: 960,
+      width: 640,
+      height: 800,
       alt: { ar: 'الكابتن محمد ناصر', en: 'Coach Mohamed Nasser' },
     },
     portrait: {

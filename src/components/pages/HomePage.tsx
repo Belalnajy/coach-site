@@ -20,14 +20,14 @@ function Hero({ lang }: { lang: Locale }) {
   const t = dict(lang);
   const [first, ...rest] = coach.headline[lang].split('\n');
   return (
-    <section className="force-dark relative isolate overflow-hidden light:mx-2 light:mt-1 light:rounded-[2rem] lg:light:mx-4" aria-labelledby="hero-title">
-      {/* Glow and grid behind everything. */}
-      <div aria-hidden="true" className="pointer-events-none absolute -top-32 start-1/2 -z-10 size-[42rem] -translate-x-1/2 glow-accent lg:start-auto lg:end-0 lg:translate-x-0 rtl:translate-x-1/2 lg:rtl:translate-x-0" />
-      <div className="container-x relative grid min-h-[calc(100svh-4rem)] items-end lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:py-10">
-        {/* Phones: the picture fills the screen behind the text (a poster);
-            wide screens: it sits in its own column. */}
-        <div className="absolute inset-x-0 top-0 h-[74%] lg:relative lg:inset-auto lg:order-last lg:h-[min(78svh,46rem)]">
-          <div className="absolute inset-0 overflow-hidden lg:rounded-[2.25rem] lg:border lg:border-line">
+    <section className="relative isolate overflow-hidden" aria-labelledby="hero-title">
+      <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-1/2 -z-10 size-[40rem] -translate-x-1/2 glow-accent lg:start-auto lg:end-0 lg:translate-x-0 rtl:translate-x-1/2 lg:rtl:translate-x-0" />
+      <div className="container-x grid gap-6 pt-4 pb-10 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-14 lg:py-10">
+        {/* The coach's photo in its own framed card: on phones above the text,
+            on wide screens beside it. Text never sits on top of him. */}
+        <div className="relative mx-auto aspect-[4/5] h-[min(36svh,24rem)] min-[400px]:h-[min(40svh,24rem)] lg:order-last lg:mx-0 lg:h-auto lg:w-full lg:max-w-[30rem] lg:justify-self-end">
+          <div aria-hidden="true" className="absolute -inset-[3px] -z-10 rounded-[calc(2rem+3px)] bg-[linear-gradient(150deg,var(--accent),transparent_45%,transparent_60%,color-mix(in_srgb,var(--accent)_60%,transparent))]" />
+          <div className="relative h-full overflow-hidden rounded-[2rem] bg-surface-2 shadow-[0_30px_60px_-30px_rgb(0_0_0/0.6)]">
             <Image
               src={coach.images.hero.src}
               alt={coach.images.hero.alt[lang]}
@@ -35,13 +35,11 @@ function Hero({ lang }: { lang: Locale }) {
               preload
               fetchPriority="high"
               loading="eager"
-              quality={60}
-              sizes="(min-width: 1024px) 45vw, 100vw"
-              className="object-cover object-[50%_8%] lg:object-[50%_20%]"
+              quality={75}
+              sizes="(min-width: 1024px) 30rem, 20rem"
+              className="object-cover"
             />
-            <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,var(--bg)_0%,var(--bg)_10%,color-mix(in_srgb,var(--bg)_75%,transparent)_38%,transparent_70%)] lg:hidden" />
           </div>
-          {/* Floating proof chips (desktop). */}
           {coach.stats?.yearsExperience !== undefined && (
             <div className="absolute start-[-2rem] bottom-16 hidden items-center gap-3 rounded-2xl border border-line bg-surface/90 p-3 pe-5 shadow-2xl backdrop-blur lg:flex">
               <span className="num grid size-12 place-items-center rounded-xl bg-accent text-2xl text-on-accent">{coach.stats.yearsExperience}</span>
@@ -56,9 +54,9 @@ function Hero({ lang }: { lang: Locale }) {
           )}
         </div>
 
-        <div className="relative z-10 pt-[30svh] pb-28 lg:p-0">
-          <p className="eyebrow mb-4">{fill(t.home.eyebrow, { role: coach.role[lang] })}</p>
-          <h1 id="hero-title" className="display text-[2.6rem] min-[400px]:text-[2.9rem] sm:text-7xl lg:text-[4.4rem] xl:text-[5rem] rtl:text-[2.35rem] sm:rtl:text-6xl lg:rtl:text-[3.6rem] xl:rtl:text-[4.2rem]">
+        <div className="relative pb-16 lg:pb-0">
+          <p className="eyebrow mb-3 lg:mb-4">{fill(t.home.eyebrow, { role: coach.role[lang] })}</p>
+          <h1 id="hero-title" className="display text-[2.15rem] min-[400px]:text-[2.6rem] sm:text-7xl lg:text-[4.4rem] xl:text-[5rem] rtl:text-[2rem] min-[400px]:rtl:text-[2.3rem] sm:rtl:text-6xl lg:rtl:text-[3.6rem] xl:rtl:text-[4.2rem]">
             <span className="block rtl:text-balance">{first}</span>
             {rest.map((line) => (
               <span key={line} className="block text-accent-text rtl:text-balance">
@@ -66,8 +64,8 @@ function Hero({ lang }: { lang: Locale }) {
               </span>
             ))}
           </h1>
-          <p className="mt-4 max-w-xl text-[0.95rem] text-pretty text-muted md:text-xl">{coach.intro[lang]}</p>
-          <div className="mt-6 flex gap-2.5 sm:gap-3 lg:mt-8" data-hero-cta>
+          <p className="mt-3 max-w-xl text-[0.95rem] text-pretty text-muted md:text-xl lg:mt-4">{coach.intro[lang]}</p>
+          <div className="mt-5 flex gap-2.5 sm:gap-3 lg:mt-8" data-hero-cta>
             <BookLink lang={lang} className="btn btn-primary btn-lg flex-1 sm:flex-none">
               <Icon name="whatsapp" size={22} />
               {t.home.primaryCta}
@@ -77,7 +75,6 @@ function Hero({ lang }: { lang: Locale }) {
               <span className="hidden sm:inline">{t.home.secondaryCta}</span>
             </Link>
           </div>
-
         </div>
       </div>
     </section>
