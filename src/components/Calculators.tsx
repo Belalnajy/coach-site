@@ -246,11 +246,12 @@ export default function Calculators({ lang }: { lang: Locale }) {
 
   const num = (v: number, d = 0) => formatNumber(lang, v, { maximumFractionDigits: d, minimumFractionDigits: d });
   const goalId = (id: string) => (booking.goals.some((g) => g.id === id) ? id : undefined);
-  const results: Record<Tab, { headline: ReactNode; unit: string; summary: string; note: string; goal?: string }> = {
+  const results: Record<Tab, { headline: ReactNode; unit: string; summary: string; spoken: string; note: string; goal?: string }> = {
     calories: {
       headline: <AnimatedNumber value={cal.target} lang={lang} />,
       unit: `${t.units.kcal} / ${t.units.perDay}`,
       summary: `${num(cal.target)} ${t.units.kcal}`,
+      spoken: `${num(cal.target)} ${t.units.kcal} / ${t.units.perDay}`,
       note: fill(t.note.calories, { target: num(cal.target), goal: t.calorieGoals[calGoal] }),
       goal: goalId(calGoal === 'lose' ? 'fat-loss' : calGoal === 'gain' ? 'muscle-gain' : 'fitness'),
     },
@@ -258,6 +259,7 @@ export default function Calculators({ lang }: { lang: Locale }) {
       headline: <AnimatedNumber value={pro.targetG} lang={lang} />,
       unit: `${t.units.g} ${t.results.proteinDaily}`,
       summary: `${num(pro.targetG)} ${t.units.g}`,
+      spoken: `${num(pro.targetG)} ${t.units.g} ${t.results.proteinDaily}`,
       note: fill(t.note.protein, { target: num(pro.targetG) }),
       goal: goalId(proteinGoal === 'lose' ? 'fat-loss' : proteinGoal === 'gain' ? 'muscle-gain' : 'fitness'),
     },
@@ -265,12 +267,14 @@ export default function Calculators({ lang }: { lang: Locale }) {
       headline: <AnimatedNumber value={ideal.bmi} lang={lang} decimals={1} />,
       unit: t.bmiCategories[ideal.category],
       summary: `${t.results.bmi} ${num(ideal.bmi, 1)}`,
+      spoken: `${t.results.bmi} ${num(ideal.bmi, 1)}, ${t.bmiCategories[ideal.category]}`,
       note: fill(t.note.bmi, { bmi: num(ideal.bmi, 1), category: t.bmiCategories[ideal.category] }),
     },
     bodyfat: {
       headline: fat.percent === null ? '—' : <AnimatedNumber value={fat.percent} lang={lang} decimals={1} />,
       unit: fat.category ? `% · ${t.bodyFatCategories[fat.category]}` : '%',
       summary: fat.percent === null ? '—' : `${num(fat.percent, 1)}%`,
+      spoken: fat.percent === null ? t.results.invalid : `${num(fat.percent, 1)}%${fat.category ? `, ${t.bodyFatCategories[fat.category]}` : ''}`,
       note: fat.percent === null ? '' : fill(t.note.bodyfat, { percent: num(fat.percent, 1) }),
     },
   };
@@ -527,7 +531,7 @@ export default function Calculators({ lang }: { lang: Locale }) {
                   <span className="font-bold">{current.unit}</span>
                 </p>
                 <p className="sr-only" aria-live="polite" aria-atomic="true">
-                  {current.summary} {current.unit}
+                  {current.spoken}
                 </p>
               </div>
               {details[tab]}
