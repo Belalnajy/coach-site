@@ -576,16 +576,20 @@ dialog.sheet:not([open])::backdrop {
 
 /* ------------------------------------------------------------ range input */
 
+/* Track and ring use the accent *as text colour*, which the config check
+   guarantees is readable on the page (a bright accent on a light page
+   would not reach the 3:1 needed for controls). */
+
 .range {
   -webkit-appearance: none;
   appearance: none;
   height: 2.75rem;
   background: transparent;
   cursor: pointer;
-  --track: linear-gradient(to right, var(--accent) var(--fill), var(--line) var(--fill));
+  --track: linear-gradient(to right, var(--accent-text) var(--fill), var(--line) var(--fill));
 }
 [dir='rtl'] .range {
-  --track: linear-gradient(to left, var(--accent) var(--fill), var(--line) var(--fill));
+  --track: linear-gradient(to left, var(--accent-text) var(--fill), var(--line) var(--fill));
 }
 .range::-webkit-slider-runnable-track {
   height: 6px;
@@ -605,7 +609,7 @@ dialog.sheet:not([open])::backdrop {
   border-radius: 50%;
   background: var(--accent);
   border: 5px solid var(--surface2);
-  box-shadow: 0 0 0 2px var(--accent), 0 4px 14px rgb(0 0 0 / 0.35);
+  box-shadow: 0 0 0 2px var(--accent-text), 0 4px 14px rgb(0 0 0 / 0.35);
   transition: transform 0.15s;
 }
 .range::-moz-range-thumb {
@@ -614,7 +618,7 @@ dialog.sheet:not([open])::backdrop {
   border-radius: 50%;
   background: var(--accent);
   border: 5px solid var(--surface2);
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-text);
 }
 .range:active::-webkit-slider-thumb {
   transform: scale(1.15);

@@ -131,7 +131,7 @@ export interface ThemeConfig {
   light: Palette;
   /**
    * Fonts are loaded by next/font, which needs them written out in code, so
-   * the choice itself lives in src/lib/fonts.ts (two lines). These names are
+   * the choice itself lives in src/lib/fonts-ar.ts and fonts-en.ts. These names are
    * only used to check that file and the config agree.
    */
   fonts: {
