@@ -150,6 +150,7 @@ export default function BeforeAfter({
     <div>
       <div
         ref={root}
+        data-ba-frame
         className="relative cursor-ew-resize overflow-hidden rounded-[1.5rem] bg-surface-2 select-none [touch-action:pan-x_pan-y]"
         // Whole photos: the frame has the pair's own shape. A very tall pair is
         // narrowed (centred) so it never grows taller than 72% of the screen.
@@ -170,9 +171,10 @@ export default function BeforeAfter({
           {t.after}
         </span>
         {/* The divider: a thin line, inside a 56px strip that takes the drag. */}
+        <div className="ba-layer pointer-events-none absolute inset-0">
         <div
           data-ba-divider
-          className="ba-divider absolute inset-y-0 w-14 -translate-x-1/2 cursor-grab touch-none active:cursor-grabbing rtl:translate-x-1/2"
+          className="pointer-events-auto absolute inset-y-0 left-1/2 w-14 -translate-x-1/2 cursor-grab touch-none active:cursor-grabbing"
           onPointerDown={onHandleDown}
           onPointerMove={onMove}
           onPointerUp={onUp}
@@ -195,6 +197,7 @@ export default function BeforeAfter({
               <path d="m9 7-5 5 5 5M15 7l5 5-5 5" />
             </svg>
           </div>
+        </div>
         </div>
       </div>
       {views.length > 1 && t.angles && (

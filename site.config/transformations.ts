@@ -12,6 +12,11 @@ import type { Localized, TransformationConfig, TransformationView } from './type
  * scripts/client-photos.mjs (originals in assets-src/clients/). The numbers
  * and texts below come only from the coach's captions.
  *
+ * Order: `order` puts the clean, high-resolution, front-facing pairs first,
+ * then strong results with good photos, then screenshot-quality posts; the
+ * results page, every filter and the home picks follow it. The home page
+ * shows the first three marked `featured`.
+ *
  * Pictures: the whole photos as posted; before and after of one view at the same size, in
  * public/images/transformations/. While this list is empty the results page,
  * its menu entry and the home block are hidden.
@@ -41,6 +46,8 @@ const view = (id: string, angle: TransformationView['angle'], width: number, hei
 export const transformations: TransformationConfig[] = [
   {
     id: 'm27',
+    order: 2,
+    featured: true,
     goal: 'fat-loss',
     title: { ar: 'تحوّل من 3 زوايا', en: 'Three-angle transformation' },
     caption: {
@@ -48,11 +55,12 @@ export const transformations: TransformationConfig[] = [
       en: 'Before and after from the front, side and back.',
     },
     views: [view('m27', 'front', 550, 1100), view('m27', 'side', 412, 1100), view('m27', 'back', 733, 1100)],
-    featured: true,
     sample: false,
   },
   {
     id: 'm26',
+    order: 1,
+    featured: true,
     goal: 'muscle-gain',
     badges: ['contest'],
     title: { ar: 'تحضير بطولة', en: 'Contest prep' },
@@ -61,11 +69,11 @@ export const transformations: TransformationConfig[] = [
       en: 'Before and after the prep: front double biceps and front lat spread.',
     },
     views: [view('m26', 'front', 733, 1100), view('m26', 'pose', 733, 1100)],
-    featured: true,
     sample: false,
   },
   {
     id: 'm05',
+    order: 6,
     goal: 'fat-loss',
     badges: ['posture', 'student'],
     title: { ar: 'من 118 إلى 98 كجم', en: '118 → 98 kg' },
@@ -76,11 +84,11 @@ export const transformations: TransformationConfig[] = [
       en: 'A 4.5-month transformation: from 118 to 98 kg in the middle of high-school final exam revision, with his hunched back fixed.',
     },
     views: [view('m05', 'front', 539, 980), view('m05', 'side', 539, 980), view('m05', 'back', 539, 980)],
-    featured: true,
     sample: false,
   },
   {
     id: 'm28',
+    order: 4,
     goal: 'fat-loss',
     title: { ar: 'من الشاطئ للجيم', en: 'Beach to gym' },
     caption: {
@@ -92,6 +100,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm02',
+    order: 14,
     goal: 'fat-loss',
     title: { ar: 'من 80 إلى 72 كجم', en: '80 → 72 kg' },
     result: { ar: '−8 كجم', en: '−8 kg' },
@@ -101,6 +110,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm10',
+    order: 13,
     goal: 'muscle-gain',
     badges: ['injury'],
     title: { ar: 'من 75 إلى 90 كجم', en: '75 → 90 kg' },
@@ -114,6 +124,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm01',
+    order: 9,
     goal: 'fat-loss',
     title: { ar: 'من 108 إلى 85 كجم', en: '108 → 85 kg' },
     result: { ar: '−23 كجم', en: '−23 kg' },
@@ -123,6 +134,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm14',
+    order: 7,
     goal: 'fat-loss',
     title: { ar: 'من 110 إلى 75 كجم', en: '110 → 75 kg' },
     result: { ar: '−35 كجم', en: '−35 kg' },
@@ -136,6 +148,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm16',
+    order: 8,
     goal: 'fat-loss',
     title: { ar: 'من 105 إلى 74 كجم', en: '105 → 74 kg' },
     result: { ar: '−31 كجم', en: '−31 kg' },
@@ -148,6 +161,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm25',
+    order: 15,
     goal: 'fat-loss',
     title: { ar: 'من 110 إلى 74 كجم', en: '110 → 74 kg' },
     result: { ar: '−36 كجم', en: '−36 kg' },
@@ -160,6 +174,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm12',
+    order: 5,
     goal: 'fat-loss',
     title: { ar: '−30 كجم', en: '−30 kg' },
     result: { ar: '−30 كجم', en: '−30 kg' },
@@ -172,6 +187,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm13',
+    order: 16,
     goal: 'fat-loss',
     title: { ar: 'من 110 إلى 88 كجم', en: '110 → 88 kg' },
     result: { ar: '−22 كجم', en: '−22 kg' },
@@ -187,6 +203,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm23',
+    order: 10,
     goal: 'fat-loss',
     title: { ar: 'من 105 إلى 82 كجم', en: '105 → 82 kg' },
     result: { ar: '−23 كجم', en: '−23 kg' },
@@ -200,6 +217,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm03',
+    order: 17,
     goal: 'fat-loss',
     badges: ['posture'],
     title: { ar: 'من 100 إلى 80 كجم', en: '100 → 80 kg' },
@@ -213,6 +231,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm08',
+    order: 21,
     goal: 'fat-loss',
     badges: ['online'],
     title: { ar: 'من 85 إلى 77 كجم', en: '85 → 77 kg' },
@@ -227,6 +246,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm09',
+    order: 18,
     goal: 'fat-loss',
     title: { ar: 'من 88 إلى 74 كجم', en: '88 → 74 kg' },
     result: { ar: '−14 كجم', en: '−14 kg' },
@@ -238,6 +258,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm22',
+    order: 12,
     goal: 'muscle-gain',
     title: { ar: 'من 72 إلى 90 كجم', en: '72 → 90 kg' },
     result: { ar: '+18 كجم', en: '+18 kg' },
@@ -251,6 +272,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm18',
+    order: 11,
     goal: 'muscle-gain',
     title: { ar: 'من 49 إلى 68 كجم', en: '49 → 68 kg' },
     result: { ar: '+19 كجم', en: '+19 kg' },
@@ -263,6 +285,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm04',
+    order: 23,
     goal: 'muscle-gain',
     title: { ar: 'من 62 إلى 77 كجم', en: '62 → 77 kg' },
     result: { ar: '+15 كجم', en: '+15 kg' },
@@ -272,6 +295,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm07',
+    order: 22,
     goal: 'fat-loss',
     title: { ar: 'من 82 إلى 74 كجم', en: '82 → 74 kg' },
     result: { ar: '−8 كجم', en: '−8 kg' },
@@ -282,6 +306,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm06',
+    order: 19,
     goal: 'fat-loss',
     title: { ar: 'من 86 إلى 74 كجم', en: '86 → 74 kg' },
     result: { ar: '−12 كجم', en: '−12 kg' },
@@ -291,6 +316,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm11',
+    order: 20,
     goal: 'fat-loss',
     badges: ['posture'],
     title: { ar: 'من 91 إلى 79 كجم', en: '91 → 79 kg' },
@@ -304,6 +330,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm21',
+    order: 24,
     goal: 'muscle-gain',
     title: { ar: 'أول 6 شهور من السنة', en: 'First 6 months of the year' },
     duration: { ar: '6 شهور', en: '6 months' },
@@ -316,6 +343,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm15',
+    order: 25,
     goal: 'muscle-gain',
     title: { ar: 'شهرين بعد كورونا', en: '2 months after the pandemic' },
     duration: { ar: 'شهرين', en: '2 months' },
@@ -328,6 +356,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm20',
+    order: 26,
     goal: 'muscle-gain',
     title: { ar: 'تحوّل مايو 2022', en: 'May 2022 transformation' },
     caption: {
@@ -339,6 +368,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm24',
+    order: 27,
     goal: 'fat-loss',
     title: { ar: 'تحوّل أكتوبر 2024', en: 'October 2024 transformation' },
     caption: {
@@ -350,6 +380,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm17',
+    order: 28,
     goal: 'fat-loss',
     title: { ar: 'تحوّل 3 شهور', en: '3-month transformation' },
     duration: { ar: '3 شهور', en: '3 months' },
@@ -362,6 +393,7 @@ export const transformations: TransformationConfig[] = [
   },
   {
     id: 'm19',
+    order: 29,
     goal: 'fat-loss',
     title: { ar: 'تحوّل 3 شهور', en: '3-month transformation' },
     duration: { ar: '3 شهور', en: '3 months' },
@@ -370,6 +402,20 @@ export const transformations: TransformationConfig[] = [
       en: 'A transformation in exactly 3 months.',
     },
     views: [view('m19', 'side', 605, 1100)],
+    sample: false,
+  },
+  {
+    id: 'm29',
+    order: 3,
+    featured: true,
+    goal: 'fat-loss',
+    badges: ['contest'],
+    title: { ar: '−5 كجم في 20 يوم', en: '−5 kg in 20 days' },
+    result: { ar: '−5 كجم', en: '−5 kg' },
+    detail: { ar: 'المركز السابع', en: 'finished 7th' },
+    duration: { ar: '20 يوم', en: '20 days' },
+    caption: { ar: 'تحضير بطولة: −5 كجم في 20 يوم، والمركز السابع.', en: 'Contest prep: −5 kg in 20 days, finished 7th.' },
+    views: [view('m29', 'front', 697, 1100)],
     sample: false,
   },
 ];

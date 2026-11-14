@@ -13,7 +13,9 @@ export const resolveSiteUrl = (fallback: string, env: Record<string, string | un
   return raw.replace(/\/+$/, '');
 };
 
-const resolved = { ...site, coach: { ...site.coach, siteUrl: resolveSiteUrl(site.coach.siteUrl) } as CoachConfig };
+// Stories in their configured order (`order`, lower first), everywhere on the site.
+const byOrder = [...site.transformations].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+const resolved = { ...site, transformations: byOrder, coach: { ...site.coach, siteUrl: resolveSiteUrl(site.coach.siteUrl) } as CoachConfig };
 
 /**
  * The validated site config. Importing this module checks site.config/

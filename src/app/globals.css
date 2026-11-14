@@ -622,8 +622,14 @@ dialog.sheet:not([open])::backdrop {
 [dir='rtl'] .ba-before {
   clip-path: inset(0 0 0 calc(100% - var(--pos)));
 }
-.ba-divider {
-  inset-inline-start: var(--pos);
+/* The divider moves with a transform, not with left/right: a transform is
+   not layout, so the slider (and its intro nudge) never counts as a layout
+   shift. The layer spans the frame; its strip sits at the layer's centre. */
+.ba-layer {
+  transform: translateX(calc(var(--pos) - 50%));
+}
+[dir='rtl'] .ba-layer {
+  transform: translateX(calc(50% - var(--pos)));
 }
 
 /* ------------------------------------------------------------ range input */

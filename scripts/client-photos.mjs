@@ -132,6 +132,8 @@ export const MORE = {
   ],
   // Clean original: beach → gym. Left = before.
   m28: [{ angle: 'front', file: '2a4ee440-image.jpg', before: box(0, 2046, 0, 4096), after: box(2049, 4096, 0, 4096), counter: false }],
+  // Clean original: «فرق 5 كيلو ف 20 يوم», 7th place. Left = after (leaner), right = before (gym); black frame cut off.
+  m29: [{ angle: 'front', file: '5afb01f2-image.jpg', flipped: true, after: box(2, 831, 82, 1391), before: box(838, 1562, 2, 1562), counter: false }],
   // Added views for existing stories.
   m08: [{ angle: 'back', file: '91df9b8e-image.jpg', before: box(0, 660, 667, IG(667)), after: box(663, 1272, 667, IG(667)), counter: false }],
   m11: [{ angle: 'side', file: '093b4847-image.jpg', before: box(0, 649, 519, IG(519)), after: box(652, 1272, 519, IG(519)), counter: [1056, 552, 186, 118, true] }],

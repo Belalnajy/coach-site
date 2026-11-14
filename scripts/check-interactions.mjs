@@ -152,7 +152,7 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     await angles[1].click();
     await sleep(300);
     const srcs = await page.$eval('article', (el) => [...el.querySelectorAll('img')].map((i) => i.getAttribute('src')).join(' '));
-    assert.match(srcs, /-side-(before|after)/, `${lang}: the second angle shows the side view`);
+    assert.ok(!/-front-(before|after)/.test(srcs) && /-(side|back|clothed|pose)-(before|after)/.test(srcs), `${lang}: the second button shows the second view (${srcs})`);
     assert.equal(await slider.evaluate((el) => el.getAttribute('aria-valuenow')), String(value), `${lang}: the divider stays put`);
     console.log(`✓ ${lang}: angle buttons switch views`);
   }
@@ -167,7 +167,7 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
   const handles = (page) =>
     page.$$eval('li:not([hidden]) [data-ba-divider]', (els) =>
       els.map((el) => {
-        const frame = el.parentElement.getBoundingClientRect();
+        const frame = el.closest('[data-ba-frame]').getBoundingClientRect();
         const r = el.getBoundingClientRect();
         return Math.round((((r.left + r.width / 2 - frame.left) / frame.width) * 1000)) / 10;
       }),
@@ -198,7 +198,7 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     const rail = await page.$('li:not([hidden]) [data-ba-divider]').then((h) => h.evaluateHandle((el) => el.closest('ul')));
     const before = await rail.evaluate((el) => el.scrollLeft);
     const pic = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els) => {
-      const r = els[0].parentElement.getBoundingClientRect();
+      const r = els[0].closest('[data-ba-frame]').getBoundingClientRect();
       return { x: r.left + r.width * 0.2, y: r.top + r.height * 0.5, w: r.width };
     });
     const dir = path === '/' ? 1 : -1; // towards the next card
@@ -213,7 +213,7 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     const knob = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els) => {
       const el = els.find((e) => { const r = e.getBoundingClientRect(); return r.left > 0 && r.right < innerWidth; });
       const r = el.getBoundingClientRect();
-      const f = el.parentElement.getBoundingClientRect();
+      const f = el.closest('[data-ba-frame]').getBoundingClientRect();
       return { x: r.left + r.width / 2, y: f.top + f.height / 2, w: f.width, i: els.indexOf(el) };
     });
     await page.touchscreen.touchStart(knob.x, knob.y);
@@ -235,14 +235,24 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await page.goto(base + path, { waitUntil: 'load' });
     await sleep(500);
+    // Every story on screen: expand "Show more" until it is gone.
+    for (let k = 0; k < 5; k++) {
+      const clicked = await page.evaluate(() => {
+        const b = [...document.querySelectorAll('button')].find((el) => /Show more|عرض المزيد/.test(el.textContent));
+        b?.click();
+        return Boolean(b);
+      });
+      if (!clicked) break;
+      await sleep(300);
+    }
     const cdp = await page.createCDPSession();
     const touch = (type, points) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points.map(([x, y]) => ({ x, y, id: 1, radiusX: 8, radiusY: 8, force: 1 })) });
     const count = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els) => els.length);
     for (let i = 0; i < count; i++) {
-      await page.$$eval('li:not([hidden]) [data-ba-divider]', (els, n) => els[n].parentElement.scrollIntoView({ block: 'center', inline: 'center' }), i);
+      await page.$$eval('li:not([hidden]) [data-ba-divider]', (els, n) => els[n].closest('[data-ba-frame]').scrollIntoView({ block: 'center', inline: 'center' }), i);
       await sleep(400);
       const box = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els, n) => {
-        const r = els[n].parentElement.getBoundingClientRect();
+        const r = els[n].closest('[data-ba-frame]').getBoundingClientRect();
         return { x: r.left, y: r.top, w: r.width, h: r.height };
       }, i);
       const midY = Math.min(box.y + box.h / 2, 600);

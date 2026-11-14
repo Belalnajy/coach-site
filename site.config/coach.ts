@@ -33,7 +33,7 @@ export const coach: CoachConfig = {
   whatsapp: '201147868373',
 
   // Only counts that are shown on the site: the stories on the results page.
-  stats: { transformations: 28 },
+  stats: { transformations: 29 },
 
   // From the coach's own post (no athlete name).
   achievements: [

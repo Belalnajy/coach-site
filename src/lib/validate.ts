@@ -235,6 +235,7 @@ export const validateConfig = (config: SiteConfig): string[] => {
         fail('transformations.ts', vat, 'before and after must be the same size so the slider lines up');
     });
     if (typeof t.sample !== 'boolean') fail('transformations.ts', `${at}.sample`, 'must be true (made-up) or false (real, consented)', t.sample);
+    if (t.order !== undefined && !Number.isFinite(t.order)) fail('transformations.ts', `${at}.order`, 'must be a number', t.order);
   });
 
   // testimonials.ts

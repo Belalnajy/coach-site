@@ -286,6 +286,11 @@ export interface TransformationConfig {
   caption: Localized;
   /** The first view is the one shown first; with more, the slider lets you switch. */
   views: TransformationView[];
+  /**
+   * Position on the site (lower first): clean, high-resolution, front-facing
+   * pairs first, screenshot-quality ones last. Stories without it come last.
+   */
+  order?: number;
   /** Show on the home page. */
   featured?: boolean;
   /** true for the template's made-up stories. Shows a "Sample" badge. */

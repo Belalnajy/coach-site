@@ -51,3 +51,13 @@ test('the coach title from the config fills the interface text', () => {
   assert.ok(!JSON.stringify(dict('ar')).includes('{title}'));
   assert.ok(!JSON.stringify(dict('en')).includes('{title}'));
 });
+
+test('stories appear in their configured order, best photos first, featured = the top three', async () => {
+  const { transformations } = await import('../../src/lib/config.ts');
+  const orders = transformations.map((t) => t.order ?? Infinity);
+  assert.deepEqual(orders, [...orders].sort((a, b) => a - b));
+  assert.deepEqual(
+    transformations.filter((t) => t.featured).map((t) => t.id),
+    transformations.slice(0, 3).map((t) => t.id),
+  );
+});
