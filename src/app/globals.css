@@ -1,0 +1,593 @@
+@import 'tailwindcss';
+
+/*
+ * Colours come from site.config/theme.ts: <ThemeStyle> writes them as CSS
+ * variables (--bg, --surface, --accent…) for the dark and light palettes.
+ * Tailwind's colour names below just point at those variables, so
+ * `bg-surface` or `text-muted` follow the theme and the config.
+ */
+@custom-variant light (&:where([data-theme='light'], [data-theme='light'] *));
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface2);
+  --color-line: var(--line);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-accent-text: var(--accent-text);
+  --color-hot: var(--hot);
+  --color-on-hot: var(--on-hot);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-latin), var(--font-body), ui-sans-serif, sans-serif;
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.1, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scroll-padding-top: 5rem;
+  }
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+    overflow-x: clip;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  :focus-visible {
+    outline: 3px solid var(--accent-text);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+  [dir='rtl'] body {
+    line-height: 1.75;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-x {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-x {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Headlines: condensed italic capitals in English; Cairo at its heaviest
+     in Arabic (it has no italic, and a slanted Arabic face looks broken). */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.005em;
+  }
+  :lang(en) .display,
+  .display:lang(en) {
+    font-style: italic;
+    text-transform: uppercase;
+  }
+  :lang(ar) .display {
+    font-family: var(--font-body);
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+  /* Numbers always use the display face, in both languages. */
+  .num {
+    font-family: var(--font-display-latin), var(--font-body);
+    font-style: italic;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  :lang(ar) .eyebrow {
+    letter-spacing: 0;
+    font-size: 0.875rem;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 1.5rem;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--accent-text);
+  }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 1rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    transition:
+      transform 0.2s var(--ease-snap),
+      background-color 0.2s,
+      box-shadow 0.2s,
+      border-color 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 60%, black) inset,
+      0 10px 30px -10px color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+  .btn-primary:hover {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 60%, black) inset,
+      0 14px 40px -8px color-mix(in srgb, var(--accent) 80%, transparent);
+  }
+  .btn-ghost {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover {
+    border-color: color-mix(in srgb, var(--text) 35%, var(--line));
+  }
+  .btn-lg {
+    min-height: 3.5rem;
+    padding-inline: 1.75rem;
+    font-size: 1.0625rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.75rem;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.15s,
+      color 0.15s,
+      border-color 0.15s,
+      transform 0.15s var(--ease-snap);
+  }
+  .chip:active {
+    transform: scale(0.96);
+  }
+  .chip[aria-pressed='true'],
+  .chip[aria-selected='true'],
+  input:checked + .chip {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+  }
+  input:focus-visible + .chip {
+    outline: 3px solid var(--accent-text);
+    outline-offset: 3px;
+  }
+
+  .badge-sample {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: var(--hot);
+    color: var(--on-hot);
+  }
+
+  /* A row that scrolls sideways on phones and snaps card by card. */
+  .rail {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1.25rem;
+    padding-inline: 1.25rem;
+    margin-inline: -1.25rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+    flex: none;
+  }
+
+  .field-label {
+    display: block;
+    font-weight: 800;
+    font-size: 0.9375rem;
+    margin-bottom: 0.6rem;
+  }
+  .input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid var(--line);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 1rem;
+    transition: border-color 0.15s;
+  }
+  .input::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+  .input:focus {
+    border-color: var(--accent-text);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-text) 30%, transparent);
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--hot);
+  }
+
+  .prose-coach {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+  .prose-coach > * + * {
+    margin-top: 1.1em;
+  }
+  .prose-coach h2 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-top: 2em;
+  }
+  .prose-coach h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-top: 1.6em;
+  }
+  .prose-coach ul,
+  .prose-coach ol {
+    padding-inline-start: 1.25rem;
+  }
+  .prose-coach ul {
+    list-style: none;
+    padding-inline-start: 0;
+  }
+  .prose-coach ul li {
+    position: relative;
+    padding-inline-start: 1.6rem;
+  }
+  .prose-coach ul li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.2rem;
+    top: 0.72em;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 2px;
+    background: var(--accent-text);
+    transform: rotate(45deg);
+  }
+  .prose-coach ol {
+    list-style: decimal;
+  }
+  .prose-coach li + li {
+    margin-top: 0.5em;
+  }
+  .prose-coach strong {
+    font-weight: 800;
+    color: var(--text);
+  }
+  .prose-coach a {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-coach blockquote {
+    border-inline-start: 4px solid var(--accent);
+    background: var(--surface);
+    padding: 1rem 1.25rem;
+    border-radius: 0 1rem 1rem 0;
+    font-weight: 600;
+  }
+  [dir='rtl'] .prose-coach blockquote {
+    border-radius: 1rem 0 0 1rem;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .glass {
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    backdrop-filter: saturate(160%) blur(18px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- motion */
+
+/* Reveal on scroll: hidden only when JavaScript runs (html.js), so nothing
+   waits for a script that never comes. The hero is never hidden: it is the
+   largest paint. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s var(--ease-snap),
+    transform 0.7s var(--ease-snap);
+}
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.rise {
+  animation: rise 0.8s var(--ease-snap) both;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes marquee-rtl {
+  to {
+    transform: translateX(50%);
+  }
+}
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+[dir='rtl'] .marquee-track {
+  animation-name: marquee-rtl;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
+/* ---------------------------------------------------------------- dialogs */
+
+/* The booking sheet and the phone menu are native <dialog>s: focus is
+   trapped, Escape closes the top one, and the page behind is inert. On
+   phones they rise from the bottom; on wider screens they are centred. */
+dialog.sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: min(92dvh, 100%);
+  padding: 0;
+  border: 0;
+  border-radius: 1.75rem 1.75rem 0 0;
+  background: var(--surface);
+  color: var(--text);
+  overflow: hidden;
+  box-shadow: 0 -20px 60px -10px rgb(0 0 0 / 0.5);
+  transform: translateY(var(--drag, 0px));
+  transition:
+    transform 0.35s var(--ease-snap),
+    opacity 0.35s,
+    overlay 0.35s allow-discrete,
+    display 0.35s allow-discrete;
+}
+dialog.sheet:not([open]) {
+  transform: translateY(100%);
+}
+@starting-style {
+  dialog.sheet[open] {
+    transform: translateY(100%);
+  }
+}
+dialog.sheet.dragging {
+  transition: none;
+}
+dialog.sheet::backdrop {
+  background: rgb(0 0 0 / 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  transition:
+    opacity 0.35s,
+    overlay 0.35s allow-discrete,
+    display 0.35s allow-discrete;
+  opacity: 1;
+}
+dialog.sheet:not([open])::backdrop {
+  opacity: 0;
+}
+@starting-style {
+  dialog.sheet[open]::backdrop {
+    opacity: 0;
+  }
+}
+@media (min-width: 768px) {
+  dialog.sheet {
+    inset: 0;
+    margin: auto;
+    width: min(40rem, calc(100% - 3rem));
+    max-height: min(52rem, calc(100dvh - 3rem));
+    border-radius: 1.75rem;
+    opacity: 1;
+    transform: none;
+  }
+  dialog.sheet:not([open]) {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  @starting-style {
+    dialog.sheet[open] {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+}
+
+/* ------------------------------------------------------ before/after slider */
+
+/* Registered so the "drag me" hint can animate it. */
+@property --pos {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 50%;
+}
+.ba-before {
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+[dir='rtl'] .ba-before {
+  clip-path: inset(0 0 0 calc(100% - var(--pos)));
+}
+.ba-divider {
+  inset-inline-start: var(--pos);
+}
+
+/* ------------------------------------------------------------ range input */
+
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2.75rem;
+  background: transparent;
+  cursor: pointer;
+  --track: linear-gradient(to right, var(--accent) var(--fill), var(--line) var(--fill));
+}
+[dir='rtl'] .range {
+  --track: linear-gradient(to left, var(--accent) var(--fill), var(--line) var(--fill));
+}
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 6px;
+  background: var(--track);
+}
+.range::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  background: var(--track);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 5px solid var(--surface2);
+  box-shadow: 0 0 0 2px var(--accent), 0 4px 14px rgb(0 0 0 / 0.35);
+  transition: transform 0.15s;
+}
+.range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 5px solid var(--surface2);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+.range:focus-visible {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 6px color-mix(in srgb, var(--accent-text) 45%, transparent);
+}
