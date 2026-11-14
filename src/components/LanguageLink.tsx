@@ -16,7 +16,7 @@ export default function LanguageLink({ lang, className = '', withIcon = true }: 
       href={twinPath(pathname, other)}
       hrefLang={other}
       lang={other}
-      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold transition hover:bg-surface-2 ${className}`}
+      className={`${className.includes('hidden') ? '' : 'inline-flex'} min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold transition hover:bg-surface-2 ${className}`}
       aria-label={t.nav.switchLanguage}
       onClick={() => {
         try {

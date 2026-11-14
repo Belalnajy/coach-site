@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Locale } from '@/lib/i18n';
 import { dict, fill } from '@/lib/i18n';
 import { coach, packages, testimonials, transformations } from '@/lib/config';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, quote } from '@/lib/format';
 import { faqJsonLd } from '@/lib/jsonld';
 import { route } from '@/lib/routes';
 import BookLink from '../BookLink';
@@ -48,17 +48,17 @@ function Hero({ lang }: { lang: Locale }) {
           </div>
         </div>
 
-        <div className="relative z-10 pt-[38svh] pb-28 lg:p-0">
+        <div className="relative z-10 pt-[30svh] pb-28 lg:p-0">
           <p className="eyebrow mb-4">{fill(t.home.eyebrow, { role: coach.role[lang] })}</p>
-          <h1 id="hero-title" className="display text-[2.9rem] sm:text-7xl lg:text-[5.6rem] xl:text-[6.2rem] rtl:text-[2.35rem] sm:rtl:text-6xl lg:rtl:text-7xl xl:rtl:text-[5rem]">
-            <span className="block text-balance">{first}</span>
+          <h1 id="hero-title" className="display text-[2.6rem] min-[400px]:text-[2.9rem] sm:text-7xl lg:text-[5.6rem] xl:text-[6.2rem] rtl:text-[2.35rem] sm:rtl:text-6xl lg:rtl:text-7xl xl:rtl:text-[5rem]">
+            <span className="block">{first}</span>
             {rest.map((line) => (
-              <span key={line} className="block text-balance text-accent-text">
+              <span key={line} className="block text-accent-text">
                 {line}
               </span>
             ))}
           </h1>
-          <p className="mt-4 max-w-xl text-pretty text-muted md:text-xl">{coach.intro[lang]}</p>
+          <p className="mt-4 max-w-xl text-[0.95rem] text-pretty text-muted md:text-xl">{coach.intro[lang]}</p>
           <div className="mt-6 flex gap-2.5 sm:gap-3 lg:mt-8">
             <BookLink lang={lang} className="btn btn-primary btn-lg flex-1 sm:flex-none">
               <Icon name="whatsapp" size={22} />
@@ -89,10 +89,12 @@ function Marquee({ lang }: { lang: Locale }) {
     </ul>
   );
   return (
-    <div className="relative z-10 -rotate-2 overflow-hidden border-y-2 border-on-accent/20 bg-accent py-3 text-on-accent">
-      <div className="marquee-track flex w-max">
-        {row(false)}
-        {row(true)}
+    <div className="relative z-10 overflow-hidden py-4">
+      <div className="-mx-4 -rotate-2 border-y-2 border-on-accent/20 bg-accent py-3 text-on-accent">
+        <div className="marquee-track flex w-max">
+          {row(false)}
+          {row(true)}
+        </div>
       </div>
     </div>
   );
@@ -294,7 +296,7 @@ function Reviews({ lang }: { lang: Locale }) {
                   </span>
                   {r.sample && <span className="badge-sample">{t.common.sampleReview}</span>}
                 </div>
-                <blockquote className="flex-1 text-pretty text-[1.02rem] leading-relaxed">“{r.quote[lang]}”</blockquote>
+                <blockquote className="flex-1 text-pretty text-[1.02rem] leading-relaxed">{quote(r.quote[lang], lang)}</blockquote>
                 <figcaption className="flex items-center gap-3 border-t border-line pt-4">
                   <span className="num grid size-11 place-items-center rounded-full bg-surface-2 text-lg text-accent-text" aria-hidden="true">
                     {initial(r.name[lang])}

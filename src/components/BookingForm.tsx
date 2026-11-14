@@ -116,7 +116,7 @@ export default function BookingForm({
 
   return (
     <form onSubmit={submit} noValidate className={sheet ? 'flex min-h-0 flex-1 flex-col' : 'grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start'}>
-      <div className={sheet ? 'min-h-0 flex-1 space-y-7 overflow-y-auto overscroll-contain px-5 pt-2 pb-6' : 'space-y-8'}>
+      <div className={sheet ? 'min-h-0 flex-1 space-y-7 overflow-y-auto overscroll-contain px-5 pt-2 pb-6' : 'min-w-0 space-y-8'}>
         <Group legend={t.book.package}>
           <div className="space-y-4">
             {groups.map(({ kind, items }) => (
@@ -219,7 +219,7 @@ export default function BookingForm({
         )}
       </div>
 
-      <div className={sheet ? `border-t border-line bg-surface px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] ${footerClassName}` : 'space-y-4 lg:sticky lg:top-24'}>
+      <div className={sheet ? `border-t border-line bg-surface px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] ${footerClassName}` : 'min-w-0 space-y-4 lg:sticky lg:top-24'}>
         {!sheet && (
           <div className="card p-4">
             <p className="mb-3 flex items-center gap-2 text-sm font-bold">

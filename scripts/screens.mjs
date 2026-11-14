@@ -28,8 +28,31 @@ for (const spec of shots) {
     await page.click('button[aria-haspopup="dialog"]');
     await new Promise((r) => setTimeout(r, 600));
   }
+  if (full === 'full' && phone) {
+    // Phones: screen-by-screen captures stitched side by side (a full-page
+    // capture resizes the viewport, which distorts svh-based layouts).
+    const total = await page.evaluate(() => document.documentElement.scrollHeight);
+    const step = 844 - 120;
+    const shots = [];
+    for (let y = 0; y < total - 200 && shots.length < 16; y += step) {
+      await page.evaluate((top) => window.scrollTo(0, top), y);
+      await new Promise((r) => setTimeout(r, 250));
+      shots.push(await page.screenshot({ captureBeyondViewport: false }));
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const sharp = (await import('sharp')).default;
+    for (let s = 0; s * 4 < shots.length; s++) {
+      const group = shots.slice(s * 4, s * 4 + 4);
+      await sharp({ create: { width: group.length * (780 + 16), height: 1688, channels: 3, background: '#ff00ff' } })
+        .composite(group.map((input, i) => ({ input, left: i * 796, top: 0 })))
+        .png()
+        .toFile(`.screens/${name}-${s}.png`);
+      console.log(`.screens/${name}-${s}.png`);
+    }
+    await page.close();
+    continue;
+  }
   if (full === 'full') {
-    // Load lazy images before a full-page capture.
     await page.evaluate(async () => {
       for (let y = 0; y < document.body.scrollHeight; y += 600) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); }
       window.scrollTo(0, 0);
@@ -37,6 +60,7 @@ for (const spec of shots) {
     await new Promise((r) => setTimeout(r, 400));
   } else await new Promise((r) => setTimeout(r, 300));
   await page.screenshot({ path: `.screens/${name}.png`, fullPage: full === 'full' });
+  console.log(`.screens/${name}.png`);
   await page.close();
   console.log(`.screens/${name}.png`);
 }

@@ -506,12 +506,12 @@ export default function Calculators({ lang }: { lang: Locale }) {
       </div>
 
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="mt-6 grid gap-6 lg:grid-cols-[1fr_26rem] lg:items-start lg:gap-10">
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <p className="text-muted">{t.blurbs[tab]}</p>
           {panels[tab]}
         </div>
 
-        <div ref={resultRef} className="lg:sticky lg:top-36">
+        <div ref={resultRef} className="min-w-0 lg:sticky lg:top-36">
           <section aria-labelledby="result-title" className="relative overflow-hidden rounded-[1.75rem] border border-accent/50 bg-surface p-6 shadow-[0_30px_80px_-40px_var(--accent)]">
             <div aria-hidden="true" className="pointer-events-none absolute -end-20 -top-20 size-56 rounded-full bg-accent/20 blur-3xl" />
             <div className="relative space-y-5">

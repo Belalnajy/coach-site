@@ -15,3 +15,6 @@ export const formatPrice = (lang: Locale, price: PackageConfig['price']): string
 
 export const formatDate = (lang: Locale, iso: string): string =>
   new Intl.DateTimeFormat(intlLocale(lang), { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
+
+/** Quotation marks per language: «…» in Arabic, “…” in English. */
+export const quote = (text: string, lang: Locale): string => (lang === 'ar' ? `«${text}»` : `“${text}”`);

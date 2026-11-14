@@ -184,6 +184,7 @@
   }
 
   .card {
+    position: relative;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 1.75rem;
@@ -240,6 +241,9 @@
 
   /* A row that scrolls sideways on phones and snaps card by card. */
   .rail {
+    /* Positioned, so absolutely placed descendants (screen-reader-only
+       labels) stay inside the scroller instead of widening the page. */
+    position: relative;
     display: flex;
     gap: 1rem;
     overflow-x: auto;

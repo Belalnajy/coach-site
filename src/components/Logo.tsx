@@ -12,7 +12,7 @@ export default function Logo({ lang }: { lang: Locale }) {
       <span className="grid size-9 -skew-x-6 place-items-center rounded-xl bg-accent text-on-accent shadow-[0_6px_20px_-6px_var(--accent)] transition group-hover:rotate-[-4deg]">
         <Icon name="bolt" size={20} strokeWidth={2.2} fill="currentColor" />
       </span>
-      <span className="display text-[1.35rem] leading-none whitespace-nowrap">{coach.name[lang]}</span>
+      <span className="display text-[1.2rem] leading-none whitespace-nowrap min-[360px]:text-[1.35rem]">{coach.name[lang]}</span>
     </Link>
   );
 }
