@@ -70,6 +70,76 @@ export const PAIRS = {
   m11: [{ angle: 'front', file: '743a1f1d-image.jpg', band: [597, 1577], before: { x0: 0, x1: 493 }, after: { x0: 497, x1: 1080 } }],
 };
 
+/**
+ * Later posts (1272 px wide screenshots, and the coach's clean originals).
+ * Each side is its own box {x0, x1, y0, y1} in source pixels, so a collage
+ * panel or a cropped-off UI strip can be described exactly. Instagram's
+ * bottom icons are left out (the last ~118 px of the post), and the "1/4"
+ * counter pill, where there is one, is filled in from the background just
+ * around it (`counter`: [left, top, width, height, true]).
+ */
+const box = (x0, x1, y0, y1) => ({ x0, x1, y0, y1 });
+const IG = (y0) => y0 + 1272 - 118; // bottom of an Instagram post without its icon strip
+export const MORE = {
+  // −30 kg (WhatsApp caption «30 كيلو»). Left = after (thinner), right = before.
+  m12: [{ angle: 'front', file: '45144c46-image.jpg', flipped: true, after: box(15, 791, 15, 1585), before: box(808, 1585, 15, 1585), counter: false }],
+  // 14/11 110 kg 45% → 6/3 88 kg 30%. First panel = before, third = after (the middle stage is listed, not shown).
+  m13: [{ angle: 'front', file: '68448272-image.jpg', before: box(0, 416, 912, 1790), after: box(841, 1272, 912, 1790), counter: false }],
+  // 110 → 75 kg in about 3 months. Suit = before; teal hoodie pair: left = before.
+  m14: [
+    { angle: 'front', file: 'c61cc675-image.jpg', before: box(0, 634, 519, IG(519)), after: box(637, 1272, 519, IG(519)), counter: [1056, 554, 186, 118, true] },
+    { angle: 'pose', file: 'bf9f7837-image.jpg', before: box(0, 614, 519, IG(519)), after: box(617, 1272, 519, IG(519)), counter: false },
+  ],
+  // 2 months after the pandemic. Left = after (more muscle).
+  m15: [{ angle: 'front', file: '3adcd5f1-image.jpg', flipped: true, after: box(0, 634, 519, IG(519)), before: box(637, 1272, 519, IG(519)), counter: false }],
+  // 105 → 74, about 30 kg. Purple tee front and back: left = after. White shirt: left = before.
+  m16: [
+    { angle: 'front', file: '92df250a-image.jpg', flipped: true, after: box(0, 634, 519, IG(519)), before: box(637, 1272, 519, IG(519)), counter: [1056, 552, 186, 118, true] },
+    { angle: 'back', file: 'ac9e0fc3-image.jpg', flipped: true, after: box(0, 634, 519, IG(519)), before: box(637, 1272, 519, IG(519)), counter: [1056, 548, 186, 118, true] },
+    { angle: 'clothed', file: 'af052fcc-image.jpg', before: box(0, 585, 519, IG(519)), after: box(588, 1272, 519, IG(519)), counter: [1056, 552, 186, 118, true] },
+  ],
+  // 3 months, still in progress. Left = before.
+  m17: [{ angle: 'front', file: '9a67006e-image.jpg', before: box(0, 593, 519, IG(519)), after: box(596, 1272, 519, IG(519)), counter: [1056, 552, 186, 118, true] }],
+  // 49 → 68. Shirtless: left = before; "GO BELGIUM" tee: left = before.
+  m18: [
+    { angle: 'front', file: 'f75509b3-image.jpg', before: box(0, 657, 655, 1912 - 118), after: box(660, 1272, 655, 1912 - 118), counter: [1056, 662, 186, 118, true] },
+    { angle: 'clothed', file: '39dc6a48-image.jpg', before: box(0, 660, 640, IG(640)), after: box(663, 1272, 640, IG(640)), counter: [1056, 673, 186, 118, true] },
+  ],
+  // 3 months, side view (Oct 2021). Left = before.
+  m19: [{ angle: 'side', file: 'c75ee454-image.jpg', before: box(0, 634, 519, IG(519)), after: box(637, 1272, 519, IG(519)), counter: [1056, 552, 186, 118, true] }],
+  // May 2022. Left = after; right = before (face covered with an emoji as posted).
+  m20: [{ angle: 'front', file: '9645b3e5-image.jpg', flipped: true, after: box(0, 667, 531, 1779), before: box(679, 1272, 531, 1779), counter: [1056, 549, 186, 118, true] }],
+  // First 6 months of the year (July 2021). Left = after (gym), right = before (beach).
+  m21: [{ angle: 'front', file: 'fe1569d4-image.jpg', flipped: true, after: box(0, 684, 519, IG(519)), before: box(687, 1272, 519, IG(519)), counter: [1056, 552, 186, 118, true] }],
+  // 72 → 90 in 6 months (muscle memory). Left = after.
+  m22: [{ angle: 'front', file: '861419cf-image.jpg', flipped: true, after: box(0, 720, 808, 2038 - 118), before: box(723, 1272, 808, 2038 - 118), counter: [1056, 798, 186, 118, true] }],
+  // 105 → 82 in about two and a half months. Left = after, right = before.
+  m23: [{ angle: 'front', file: 'a7702af7-image.jpg', flipped: true, after: box(0, 634, 668, IG(668)), before: box(637, 1272, 668, IG(668)), counter: [1056, 701, 186, 118, true] }],
+  // "TRANSFORMATION", Oct 2024. Left = before, right = after (leaner).
+  m24: [{ angle: 'front', file: '587bbf29-image.jpg', before: box(0, 574, 519, IG(519)), after: box(577, 1272, 519, IG(519)), counter: false }],
+  // 110 → 74 (Aug 2024). Collage: big left = before; top right = after.
+  m25: [{ angle: 'front', file: '0720116b-image.jpg', before: box(0, 732, 676, 1948), after: box(735, 1272, 676, 1334), counter: [1072, 702, 166, 130, true] }],
+  // Clean originals: contest prep. Left = before in both.
+  m26: [
+    { angle: 'front', file: '905a0bec-image.jpg', before: box(0, 2046, 0, 3072), after: box(2049, 4096, 0, 3072), counter: false },
+    { angle: 'pose', file: 'fbdbc3cf-image.jpg', before: box(0, 2046, 0, 3072), after: box(2049, 4096, 0, 3072), counter: false },
+  ],
+  // Clean originals: locker room. Front: left = before; side and back: left = after.
+  m27: [
+    { angle: 'front', file: '3da7e4ec-image.jpg', before: box(0, 2046, 0, 4096), after: box(2049, 4096, 0, 4096), counter: false },
+    { angle: 'side', file: 'd538822c-image.jpg', flipped: true, after: box(0, 1534, 0, 4096), before: box(1537, 3072, 0, 4096), counter: false },
+    { angle: 'back', file: '0b93a4cc-image.jpg', flipped: true, after: box(0, 2046, 0, 3072), before: box(2049, 4096, 0, 3072), counter: false },
+  ],
+  // Clean original: beach → gym. Left = before.
+  m28: [{ angle: 'front', file: '2a4ee440-image.jpg', before: box(0, 2046, 0, 4096), after: box(2049, 4096, 0, 4096), counter: false }],
+  // Added views for existing stories.
+  m08: [{ angle: 'back', file: '91df9b8e-image.jpg', before: box(0, 660, 667, IG(667)), after: box(663, 1272, 667, IG(667)), counter: false }],
+  m11: [{ angle: 'side', file: '093b4847-image.jpg', before: box(0, 649, 519, IG(519)), after: box(652, 1272, 519, IG(519)), counter: [1056, 552, 186, 118, true] }],
+};
+
+/** Tallest output: big originals are scaled down to this (never up). */
+const MAX_H = 1100;
+
 /** The achievement photos: the coach with his athlete (medal, certificate). */
 const ACHIEVEMENTS = [
   { name: 'shalaby-classic-1', file: '22867822-image.jpg', box: [120, 960, 800, 1000] },
@@ -104,24 +174,77 @@ const onCanvas = async (photo, width, height) => {
   return sharp(back).composite([{ input: photo, left: Math.round((width - meta.width) / 2), top: 0 }]).png().toBuffer();
 };
 
+/** Covers a counter pill at box [left, top, width, height] with what is just below it. */
+const coverCounter = async (file, [left, top, width, height, flat]) => {
+  const img = sharp(path.join(SRC, file));
+  if (flat) {
+    // Fill the pill's box from its edges (each pixel blends the pixels just
+    // outside the box on its row and column), so wall gradients carry on
+    // through; then a light blur. A simple inpaint: background only.
+    const { data, info } = await sharp(path.join(SRC, file)).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    const W = info.width;
+    const at = (x, y, c) => data[(y * W + x) * 3 + c];
+    const r = Math.min(left + width, W - 1);
+    const b = top + height;
+    const patch = Buffer.alloc(width * height * 4);
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++) {
+        const fx = (x + 1) / (width + 1);
+        const fy = (y + 1) / (height + 1);
+        for (let c = 0; c < 3; c++) {
+          const h = at(left - 1, top + y, c) * (1 - fx) + at(r, top + y, c) * fx;
+          const v = at(left + x, top - 1, c) * (1 - fy) + at(left + x, b, c) * fy;
+          patch[(y * width + x) * 4 + c] = Math.round((h + v) / 2);
+        }
+        // Fully opaque over the pill, fading out over the outer 14 px.
+        const edge = Math.min(x, y, width - 1 - x, height - 1 - y);
+        patch[(y * width + x) * 4 + 3] = Math.round(255 * Math.min(1, (edge + 2) / 14));
+      }
+    const smooth = await sharp(patch, { raw: { width, height, channels: 4 } }).blur(5).png().toBuffer();
+    return sharp(await img.composite([{ input: smooth, left, top }]).png().toBuffer());
+  }
+  const below = { left, top: top + height + 6, width, height };
+  const mask = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><defs><filter id="f"><feGaussianBlur stdDeviation="3"/></filter></defs><rect x="4" y="-20" width="${width + 20}" height="${height + 16}" rx="14" fill="#fff" filter="url(#f)"/></svg>`,
+  );
+  const fill = await sharp(path.join(SRC, file)).extract(below).blur(2).ensureAlpha().composite([{ input: mask, blend: 'dest-in' }]).png().toBuffer();
+  return sharp(await img.composite([{ input: fill, left, top }]).png().toBuffer());
+};
+
+/** Both photos of a view at one height (the smaller one's, at most MAX_H), centred on one canvas. */
+const writePair = async (id, angle, src, boxes) => {
+  const photos = {};
+  for (const side of ['before', 'after']) {
+    const b = boxes[side];
+    photos[side] = await sharp(src).extract({ left: b.x0, top: b.y0, width: b.x1 - b.x0, height: b.y1 - b.y0 }).png().toBuffer();
+  }
+  const height = Math.min(MAX_H, boxes.before.y1 - boxes.before.y0, boxes.after.y1 - boxes.after.y0);
+  for (const side of ['before', 'after']) photos[side] = await sharp(photos[side]).resize({ height }).png().toBuffer();
+  const widths = await Promise.all(['before', 'after'].map(async (side) => (await sharp(photos[side]).metadata()).width));
+  const width = Math.max(...widths);
+  for (const side of ['before', 'after']) {
+    const name = `${id}-${angle}-${side}.webp`;
+    const file = path.join(OUT, name);
+    await sharp(await onCanvas(photos[side], width, height)).webp({ quality: 78, effort: 6 }).toFile(file);
+    console.log(`  ${name.padEnd(26)} ${width}×${height}  ${(fs.statSync(file).size / 1024).toFixed(0)} KB`);
+  }
+  return [width, height];
+};
+
 const main = async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const sizes = {};
   for (const [id, views] of Object.entries(PAIRS))
     for (const v of views) {
       const src = await (await source(v)).png().toBuffer();
-      const height = v.band[1] - v.band[0];
-      const photos = {};
-      for (const side of ['before', 'after'])
-        photos[side] = await sharp(src).extract({ left: v[side].x0, top: v.band[0], width: v[side].x1 - v[side].x0, height }).png().toBuffer();
-      const width = Math.max(v.before.x1 - v.before.x0, v.after.x1 - v.after.x0);
-      for (const side of ['before', 'after']) {
-        const name = `${id}-${v.angle}-${side}.webp`;
-        const file = path.join(OUT, name);
-        await sharp(await onCanvas(photos[side], width, height)).webp({ quality: 78, effort: 6 }).toFile(file);
-        console.log(`  ${name.padEnd(26)} ${width}×${height}  ${(fs.statSync(file).size / 1024).toFixed(0)} KB`);
-      }
-      sizes[`${id}-${v.angle}`] = [width, height];
+      const boxes = Object.fromEntries(['before', 'after'].map((side) => [side, { ...v[side], y0: v.band[0], y1: v.band[1] }]));
+      sizes[`${id}-${v.angle}`] = await writePair(id, v.angle, src, boxes);
+    }
+  for (const [id, views] of Object.entries(MORE))
+    for (const v of views) {
+      const counter = v.counter || null;
+      const src = await (counter ? await coverCounter(v.file, counter) : sharp(path.join(SRC, v.file))).png().toBuffer();
+      sizes[`${id}-${v.angle}`] = await writePair(id, v.angle, src, v);
     }
   console.log(JSON.stringify(sizes));
   const achDir = path.join(ROOT, 'public', 'images', 'achievements');

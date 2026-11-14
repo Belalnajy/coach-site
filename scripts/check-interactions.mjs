@@ -165,7 +165,7 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
 // rail scrolls the rail and leaves the handle alone.
 {
   const handles = (page) =>
-    page.$$eval('[data-ba-divider]', (els) =>
+    page.$$eval('li:not([hidden]) [data-ba-divider]', (els) =>
       els.map((el) => {
         const frame = el.parentElement.getBoundingClientRect();
         const r = el.getBoundingClientRect();
@@ -193,11 +193,11 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await page.reload({ waitUntil: 'load' });
     await sleep(500);
-    await page.$eval('[data-ba-divider]', (el) => el.closest('ul').scrollIntoView({ block: 'center' }));
+    await page.$eval('li:not([hidden]) [data-ba-divider]', (el) => el.closest('ul').scrollIntoView({ block: 'center' }));
     await sleep(400);
-    const rail = await page.$('[data-ba-divider]').then((h) => h.evaluateHandle((el) => el.closest('ul')));
+    const rail = await page.$('li:not([hidden]) [data-ba-divider]').then((h) => h.evaluateHandle((el) => el.closest('ul')));
     const before = await rail.evaluate((el) => el.scrollLeft);
-    const pic = await page.$$eval('[data-ba-divider]', (els) => {
+    const pic = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els) => {
       const r = els[0].parentElement.getBoundingClientRect();
       return { x: r.left + r.width * 0.2, y: r.top + r.height * 0.5, w: r.width };
     });
@@ -210,7 +210,7 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     assert.ok(Math.abs(after - before) > 40, `${path}: a swipe on a picture scrolls the rail (${before} → ${after})`);
     (await handles(page)).forEach((p, i) => assert.ok(Math.abs(p - 50) < 1, `${path}: after the swipe, card ${i + 1} handle stays at 50% (${p}%)`));
     // A finger on the handle itself does move it.
-    const knob = await page.$$eval('[data-ba-divider]', (els) => {
+    const knob = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els) => {
       const el = els.find((e) => { const r = e.getBoundingClientRect(); return r.left > 0 && r.right < innerWidth; });
       const r = el.getBoundingClientRect();
       const f = el.parentElement.getBoundingClientRect();
@@ -237,11 +237,11 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     await sleep(500);
     const cdp = await page.createCDPSession();
     const touch = (type, points) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points.map(([x, y]) => ({ x, y, id: 1, radiusX: 8, radiusY: 8, force: 1 })) });
-    const count = await page.$$eval('[data-ba-divider]', (els) => els.length);
+    const count = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els) => els.length);
     for (let i = 0; i < count; i++) {
-      await page.$$eval('[data-ba-divider]', (els, n) => els[n].parentElement.scrollIntoView({ block: 'center', inline: 'center' }), i);
+      await page.$$eval('li:not([hidden]) [data-ba-divider]', (els, n) => els[n].parentElement.scrollIntoView({ block: 'center', inline: 'center' }), i);
       await sleep(400);
-      const box = await page.$$eval('[data-ba-divider]', (els, n) => {
+      const box = await page.$$eval('li:not([hidden]) [data-ba-divider]', (els, n) => {
         const r = els[n].parentElement.getBoundingClientRect();
         return { x: r.left, y: r.top, w: r.width, h: r.height };
       }, i);
@@ -269,6 +269,20 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     await page.close();
   }
   console.log('✓ sliders: real touch taps (20%, 80%) and vertical scrolls on every photo never move a divider (AR/EN, results page and home rail)');
+}
+
+{
+  // Results: 12 stories first, "Show more" reveals the rest; filters show counts.
+  const page = await phone('/en/transformations');
+  const visible = () => page.$$eval('#main li:has(article):not([hidden])', (els) => els.length);
+  assert.equal(await visible(), 12, 'twelve stories at first');
+  const total = await page.$eval('button[aria-pressed="true"] .num', (el) => Number(el.textContent));
+  assert.ok(total > 12, `the All chip counts every story (${total})`);
+  for (const b of await page.$$('button')) if (/Show more/.test(await b.evaluate((el) => el.textContent))) await b.evaluate((el) => el.click());
+  await sleep(300);
+  assert.equal(await visible(), Math.min(24, total), 'Show more adds twelve');
+  console.log(`✓ results: 12 shown of ${total}, Show more adds the next 12, chips show counts`);
+  await page.close();
 }
 
 {

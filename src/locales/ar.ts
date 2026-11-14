@@ -154,9 +154,11 @@ export const ar = {
     resultsVary: 'النتائج تختلف من شخص لآخر حسب الالتزام ونقطة البداية.',
     empty: 'لا توجد قصص لهذا الهدف بعد.',
     cta: 'أريد نتيجة مثلها',
-    angles: { front: 'أمامي', side: 'جانبي', back: 'خلفي' },
+    angles: { front: 'أمامي', side: 'جانبي', back: 'خلفي', clothed: 'بالملابس', pose: 'صورة ثانية' },
     anglesLabel: 'زاوية الصورة',
-    badges: { posture: 'تصحيح وضعية الظهر', online: 'متابعة أونلاين', injury: 'عودة بعد إصابة', student: 'أثناء الثانوية العامة' },
+    badges: { posture: 'تصحيح وضعية الظهر', online: 'متابعة أونلاين', injury: 'عودة بعد إصابة', student: 'أثناء الثانوية العامة', contest: 'تحضير بطولة' },
+    stages: 'مراحل',
+    showMore: 'عرض المزيد ({n})',
   },
   programs: {
     eyebrow: 'الباقات',

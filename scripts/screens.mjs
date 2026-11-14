@@ -20,6 +20,13 @@ for (const spec of shots) {
   await page.goto(base + path, { waitUntil: 'load', timeout: 60000 });
   await new Promise((r) => setTimeout(r, 800));
   await page.evaluate(() => document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible')));
+  if (/^card\d+$/.test(action)) {
+    // Scroll the n-th visible story card (1-based) to the top of the screen.
+    const n = Number(action.slice(4)) - 1;
+    await page.$$eval('#main li:has(article):not([hidden])', (els, i) => els[i].scrollIntoView({ block: 'start' }), n);
+    await page.evaluate(() => window.scrollBy(0, -140));
+    await new Promise((r) => setTimeout(r, 800));
+  }
   if (/^angle\d$/.test(action)) {
     // Switch every multi-angle card to its n-th view (cards without one keep theirs).
     const n = Number(action.slice(5)) - 1;

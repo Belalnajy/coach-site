@@ -69,7 +69,7 @@ test('stories: views must pair up, angles must be distinct, badges known', () =>
   ];
   const errors = validateConfig(bad);
   const has = (needle: string) => assert.ok(errors.some((e) => e.includes(needle)), `expected an error mentioning ${needle}\n${errors.join('\n')}`);
-  has('transformations[0].badges[0]: must be "posture", "online", "injury" or "student"');
+  has('transformations[0].badges[0]: must be "posture", "online", "injury", "student" or "contest"');
   has('transformations[0].views[0]: before and after must be the same size');
   has('transformations[0].views[1].angle: is used twice');
   has('transformations[1].views: needs at least one before/after pair');

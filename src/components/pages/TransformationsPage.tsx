@@ -28,7 +28,7 @@ export default function TransformationsPage({ lang }: { lang: Locale }) {
           <TransformationsGallery
             lang={lang}
             chips={chips}
-            labels={{ all: t.all, filterLabel: t.filterLabel, count: t.count, empty: t.empty, cta: t.cta }}
+            labels={{ all: t.all, filterLabel: t.filterLabel, count: t.count, empty: t.empty, cta: t.cta, showMore: t.showMore }}
             stories={transformations.map((s, i) => ({
               id: s.id,
               goals: goalsOf(s),

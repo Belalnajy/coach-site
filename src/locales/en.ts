@@ -151,9 +151,11 @@ export const en: Dict = {
     resultsVary: 'Results vary from person to person with consistency and starting point.',
     empty: 'No stories for this goal yet.',
     cta: 'I want a result like this',
-    angles: { front: 'Front', side: 'Side', back: 'Back' },
+    angles: { front: 'Front', side: 'Side', back: 'Back', clothed: 'Clothed', pose: 'Second photo' },
     anglesLabel: 'Photo angle',
-    badges: { posture: 'Posture fixed', online: 'Online coaching', injury: 'Injury comeback', student: 'During final exams' },
+    badges: { posture: 'Posture fixed', online: 'Online coaching', injury: 'Injury comeback', student: 'During final exams', contest: 'Contest prep' },
+    stages: 'Stages',
+    showMore: 'Show more ({n})',
   },
   programs: {
     eyebrow: 'Programs',

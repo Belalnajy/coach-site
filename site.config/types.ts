@@ -253,13 +253,14 @@ export interface BookingConfig {
 
 /** One camera angle of a before/after pair. Both pictures the same size (4:5). */
 export interface TransformationView {
-  angle: 'front' | 'side' | 'back';
+  /** front, side, back; "clothed" for a dressed before/after; "pose" for a second pose. */
+  angle: 'front' | 'side' | 'back' | 'clothed' | 'pose';
   before: Picture;
   after: Picture;
 }
 
 /** Extra facts about a story, each shown as a small badge and usable as a filter. */
-export type TransformationBadge = 'posture' | 'online' | 'injury' | 'student';
+export type TransformationBadge = 'posture' | 'online' | 'injury' | 'student' | 'contest';
 
 export interface TransformationConfig {
   id: string;
@@ -270,12 +271,17 @@ export interface TransformationConfig {
   badges?: TransformationBadge[];
   /** Short title. Never the client's name unless they asked for it. */
   title: Localized;
-  /** The headline result, e.g. "−23 kg" or "+15 kg". */
-  result: Localized;
+  /**
+   * The headline result, e.g. "−23 kg" or "+15 kg". Only when the coach's
+   * caption gives a number; without it the card shows no result tile.
+   */
+  result?: Localized;
   /** A second figure, e.g. "108 → 85 kg" or "body fat 26% → 11%". */
   detail?: Localized;
   /** How long it took, only if known, e.g. "4 months". */
   duration?: Localized;
+  /** Stages in between, from the caption, e.g. "23/1: 95 kg, 35% fat". */
+  stages?: Localized[];
   /** One or two sentences from the coach's own post. No invented quotes. */
   caption: Localized;
   /** The first view is the one shown first; with more, the slider lets you switch. */

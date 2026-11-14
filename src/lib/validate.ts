@@ -217,15 +217,16 @@ export const validateConfig = (config: SiteConfig): string[] => {
       if (!goals.has(tag)) fail('transformations.ts', `${at}.tags[${j}]`, `must be one of the goals in booking.ts: ${[...goals].join(', ')}`, tag);
     });
     t.badges?.forEach((badge, j) => {
-      if (!['posture', 'online', 'injury', 'student'].includes(badge)) fail('transformations.ts', `${at}.badges[${j}]`, 'must be "posture", "online", "injury" or "student"', badge);
+      if (!['posture', 'online', 'injury', 'student', 'contest'].includes(badge)) fail('transformations.ts', `${at}.badges[${j}]`, 'must be "posture", "online", "injury", "student" or "contest"', badge);
     });
-    for (const key of ['title', 'result', 'caption'] as const) text('transformations.ts', `${at}.${key}`, t[key]);
-    for (const key of ['detail', 'duration'] as const) if (t[key]) text('transformations.ts', `${at}.${key}`, t[key]);
+    for (const key of ['title', 'caption'] as const) text('transformations.ts', `${at}.${key}`, t[key]);
+    for (const key of ['result', 'detail', 'duration'] as const) if (t[key]) text('transformations.ts', `${at}.${key}`, t[key]);
+    t.stages?.forEach((st, j) => text('transformations.ts', `${at}.stages[${j}]`, st));
     if (!Array.isArray(t.views) || t.views.length === 0) fail('transformations.ts', `${at}.views`, 'needs at least one before/after pair');
     const angles = new Set<string>();
     t.views?.forEach((v, j) => {
       const vat = `${at}.views[${j}]`;
-      if (!['front', 'side', 'back'].includes(v.angle)) fail('transformations.ts', `${vat}.angle`, 'must be "front", "side" or "back"', v.angle);
+      if (!['front', 'side', 'back', 'clothed', 'pose'].includes(v.angle)) fail('transformations.ts', `${vat}.angle`, 'must be "front", "side", "back", "clothed" or "pose"', v.angle);
       if (angles.has(v.angle)) fail('transformations.ts', `${vat}.angle`, 'is used twice in this story', v.angle);
       angles.add(v.angle);
       picture('transformations.ts', `${vat}.before`, v.before);

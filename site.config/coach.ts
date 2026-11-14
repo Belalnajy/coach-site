@@ -32,8 +32,8 @@ export const coach: CoachConfig = {
   // Egypt (+20), digits only.
   whatsapp: '201147868373',
 
-  // Only counts that are shown on the site: the 11 stories on the results page.
-  stats: { transformations: 11 },
+  // Only counts that are shown on the site: the stories on the results page.
+  stats: { transformations: 28 },
 
   // From the coach's own post (no athlete name).
   achievements: [
