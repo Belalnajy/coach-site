@@ -14,14 +14,14 @@ const vars = (p: Palette) =>
  * the default mode applies; with it, the visitor's saved choice is stamped
  * on <html data-theme> before the first paint (THEME_INIT below).
  */
-const THEME_CSS = `:root{${vars(theme[theme.defaultMode])}--accent:${theme.accent};--on-accent:${theme.onAccent};--hot:${theme.hot};--on-hot:${theme.onHot};color-scheme:${theme.defaultMode}}
+export const THEME_CSS = `:root{${vars(theme[theme.defaultMode])}--accent:${theme.accent};--on-accent:${theme.onAccent};--hot:${theme.hot};--on-hot:${theme.onHot};color-scheme:${theme.defaultMode}}
 :root[data-theme=dark]{${vars(theme.dark)}color-scheme:dark}
 :root[data-theme=light]{${vars(theme.light)}color-scheme:light}
 .force-dark{${vars(theme.dark)}color-scheme:dark;background:var(--bg);color:var(--text)}`;
 
 // Runs before anything paints: marks that JS is on (for scroll reveals) and
 // applies the saved theme, so a light-mode visitor never sees a dark flash.
-const THEME_INIT = `(function(d){d.classList.add('js');try{var m=localStorage.getItem('theme');d.setAttribute('data-theme',m==='light'||m==='dark'?m:'${theme.defaultMode}')}catch(e){d.setAttribute('data-theme','${theme.defaultMode}')}})(document.documentElement)`;
+export const THEME_INIT = `(function(d){d.classList.add('js');try{var m=localStorage.getItem('theme');d.setAttribute('data-theme',m==='light'||m==='dark'?m:'${theme.defaultMode}')}catch(e){d.setAttribute('data-theme','${theme.defaultMode}')}})(document.documentElement)`;
 
 /**
  * The <html> document shared by both language trees. Each tree has its own

@@ -439,14 +439,44 @@
   }
 }
 
+/* The Book button's pulse: a ring that scales and fades. Transform and
+   opacity only, so it runs on the compositor and never repaints the page. */
 @keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  from {
+    transform: scale(1);
+    opacity: 0.55;
   }
-  70%,
-  100% {
-    box-shadow: 0 0 0 14px transparent;
+  to {
+    transform: scale(1.45);
+    opacity: 0;
   }
+}
+.pulse-ring {
+  position: relative;
+}
+.pulse-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--accent);
+  z-index: -1;
+  animation: pulse-ring 2.6s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring::after {
+    display: none;
+  }
+}
+
+/* Soft glows, drawn as gradients rather than blurred boxes. */
+.glow-accent {
+  border-radius: 999px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 22%, transparent), transparent);
+}
+.glow-hot {
+  border-radius: 999px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--hot) 20%, transparent), transparent);
 }
 
 /* ---------------------------------------------------------------- dialogs */

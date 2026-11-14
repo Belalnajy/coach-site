@@ -515,7 +515,7 @@ export default function Calculators({ lang }: { lang: Locale }) {
 
         <div ref={resultRef} className="min-w-0 lg:sticky lg:top-36">
           <section aria-labelledby="result-title" className="relative overflow-hidden rounded-[1.75rem] border border-accent/50 bg-surface p-6 shadow-[0_30px_80px_-40px_var(--accent)]">
-            <div aria-hidden="true" className="pointer-events-none absolute -end-20 -top-20 size-56 rounded-full bg-accent/20 blur-3xl" />
+            <div aria-hidden="true" className="pointer-events-none absolute -end-20 -top-20 size-56 glow-accent" />
             <div className="relative space-y-5">
               <div>
                 <h2 id="result-title" className="flex items-center justify-between gap-2 text-sm font-bold text-muted">

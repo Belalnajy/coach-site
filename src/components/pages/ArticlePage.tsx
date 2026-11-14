@@ -91,7 +91,7 @@ export default function ArticlePage({ lang, post }: { lang: Locale; post: Post }
       </header>
       <div className="container-x mt-8 max-w-4xl">
         <div className="relative aspect-[16/9] overflow-hidden rounded-[1.75rem] border border-line bg-surface-2">
-          <Image src={post.cover} alt="" fill priority sizes="(min-width: 900px) 860px, 100vw" className="object-cover" />
+          <Image src={post.cover} alt="" fill preload fetchPriority="high" loading="eager" sizes="(min-width: 900px) 860px, 100vw" className="object-cover" />
         </div>
       </div>
       <div className="container-x max-w-3xl py-10">

@@ -30,8 +30,13 @@ const CSP = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // One static 404 document for every unknown address, in either language
+  // (src/app/global-not-found.tsx): needed because each language has its
+  // own root layout.
+  experimental: { globalNotFound: true },
   images: {
     formats: ['image/avif', 'image/webp'],
+    qualities: [60, 75],
     deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1600, 1920],
     imageSizes: [64, 96, 128, 256, 384],
   },

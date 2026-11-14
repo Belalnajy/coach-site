@@ -32,7 +32,7 @@ export default function MobileTabBar({ lang }: { lang: Locale }) {
             return (
               <li key={key} className="flex flex-1 justify-center">
                 <BookLink lang={lang} className="-mt-5 flex flex-col items-center gap-1 text-[0.7rem] font-extrabold">
-                  <span className="grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_10px_24px_-6px_var(--accent)] ring-4 ring-bg [animation:pulse-ring_2.6s_ease-out_infinite]">
+                  <span className="grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_10px_24px_-6px_var(--accent)] ring-4 ring-bg pulse-ring">
                     <Icon name="whatsapp" size={26} />
                   </span>
                   {t.book}

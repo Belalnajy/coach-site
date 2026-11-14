@@ -14,10 +14,10 @@ export default function AboutPage({ lang }: { lang: Locale }) {
   return (
     <>
       <section className="relative overflow-hidden border-b border-line">
-        <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-[-10%] size-[30rem] rounded-full bg-hot/15 blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-[-10%] size-[30rem] glow-hot" />
         <div className="container-x relative grid gap-8 py-10 md:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-14">
           <div className="relative mx-auto aspect-[4/5] w-full max-w-[17rem] overflow-hidden rounded-[2rem] sm:max-w-sm border border-line lg:max-w-none">
-            <Image src={coach.images.portrait.src} alt={coach.images.portrait.alt[lang]} fill priority sizes="(min-width: 1024px) 40vw, 90vw" className="object-cover" />
+            <Image src={coach.images.portrait.src} alt={coach.images.portrait.alt[lang]} fill preload fetchPriority="high" loading="eager" sizes="(min-width: 1024px) 40vw, 90vw" className="object-cover" />
           </div>
           <div>
             <p className="eyebrow rise mb-4">{t.about.eyebrow}</p>
@@ -120,23 +120,23 @@ export default function AboutPage({ lang }: { lang: Locale }) {
               <h3 className="text-2xl font-black">{loc.gym[lang]}</h3>
             </div>
             <dl className="space-y-4">
-              <div className="flex gap-3">
-                <Icon name="pin" size={20} className="mt-1 shrink-0 text-accent-text" />
-                <div>
-                  <dt className="text-sm font-bold text-muted">{t.about.address}</dt>
-                  <dd className="font-semibold">
-                    {loc.address[lang]}
-                    {lang === 'ar' ? '، ' : ', '}
-                    {loc.city[lang]}
-                  </dd>
-                </div>
+              <div>
+                <dt className="flex items-center gap-2 text-sm font-bold text-muted">
+                  <Icon name="pin" size={18} className="text-accent-text" />
+                  {t.about.address}
+                </dt>
+                <dd className="ms-[1.625rem] font-semibold">
+                  {loc.address[lang]}
+                  {lang === 'ar' ? '، ' : ', '}
+                  {loc.city[lang]}
+                </dd>
               </div>
-              <div className="flex gap-3">
-                <Icon name="clock" size={20} className="mt-1 shrink-0 text-accent-text" />
-                <div>
-                  <dt className="text-sm font-bold text-muted">{t.about.hours}</dt>
-                  <dd className="font-semibold">{loc.hours[lang]}</dd>
-                </div>
+              <div>
+                <dt className="flex items-center gap-2 text-sm font-bold text-muted">
+                  <Icon name="clock" size={18} className="text-accent-text" />
+                  {t.about.hours}
+                </dt>
+                <dd className="ms-[1.625rem] font-semibold">{loc.hours[lang]}</dd>
               </div>
             </dl>
             <div className="border-t border-line pt-6">

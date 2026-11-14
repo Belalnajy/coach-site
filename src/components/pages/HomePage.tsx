@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Locale } from '@/lib/i18n';
 import { dict, fill } from '@/lib/i18n';
@@ -20,7 +21,7 @@ function Hero({ lang }: { lang: Locale }) {
   return (
     <section className="force-dark relative isolate overflow-hidden light:mx-2 light:mt-1 light:rounded-[2rem] lg:light:mx-4" aria-labelledby="hero-title">
       {/* Glow and grid behind everything. */}
-      <div aria-hidden="true" className="pointer-events-none absolute -top-32 start-1/2 -z-10 size-[42rem] -translate-x-1/2 rounded-full bg-accent/20 blur-[120px] lg:start-auto lg:end-0 lg:translate-x-0 rtl:translate-x-1/2 lg:rtl:translate-x-0" />
+      <div aria-hidden="true" className="pointer-events-none absolute -top-32 start-1/2 -z-10 size-[42rem] -translate-x-1/2 glow-accent lg:start-auto lg:end-0 lg:translate-x-0 rtl:translate-x-1/2 lg:rtl:translate-x-0" />
       <div className="container-x relative grid min-h-[calc(100svh-4rem)] items-end lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:py-10">
         {/* Phones: the picture fills the screen behind the text (a poster);
             wide screens: it sits in its own column. */}
@@ -30,8 +31,11 @@ function Hero({ lang }: { lang: Locale }) {
               src={coach.images.hero.src}
               alt={coach.images.hero.alt[lang]}
               fill
-              priority
+              preload
               fetchPriority="high"
+              loading="eager"
+              decoding="sync"
+              quality={60}
               sizes="(min-width: 1024px) 45vw, 100vw"
               className="object-cover object-[50%_8%] lg:object-[50%_20%]"
             />
@@ -111,15 +115,15 @@ function Proof({ lang }: { lang: Locale }) {
     <section aria-label={t.label} className="container-x pt-14 md:pt-20">
       <dl className="grid grid-cols-3 gap-2 md:gap-4" data-reveal>
         {stats.map((s) => (
-          <div key={s.label} className="card flex flex-col items-center gap-1 px-2 py-5 text-center md:flex-row md:gap-4 md:px-7 md:py-7 md:text-start">
-            <Icon name={s.icon} size={26} className="mb-1 hidden text-accent-text md:mb-0 md:block" />
-            <div className="flex flex-col-reverse">
-              <dt className="text-xs leading-tight font-semibold text-muted md:text-base">{s.label}</dt>
-              <dd className="num text-[2.6rem] leading-none md:text-6xl">
-                {formatNumber(lang, s.value)}
-                <span className="text-accent-text">+</span>
-              </dd>
-            </div>
+          <div key={s.label} className="card flex flex-col items-center gap-1 px-2 py-5 text-center md:items-start md:px-7 md:py-7 md:text-start">
+            <dt className="flex items-center gap-2 text-xs leading-tight font-semibold text-muted md:text-base">
+              <Icon name={s.icon} size={20} className="hidden text-accent-text md:block" />
+              {s.label}
+            </dt>
+            <dd className="num order-first text-[2.6rem] leading-none md:text-6xl">
+              {formatNumber(lang, s.value)}
+              <span className="text-accent-text">+</span>
+            </dd>
           </div>
         ))}
       </dl>
@@ -238,7 +242,7 @@ function Tools({ lang }: { lang: Locale }) {
   return (
     <section className="container-x pb-16 md:pb-24" aria-labelledby="tools-title">
       <div className="relative overflow-hidden rounded-[2rem] border border-line bg-surface p-6 md:p-12" data-reveal>
-        <div aria-hidden="true" className="pointer-events-none absolute -end-24 -top-24 size-80 rounded-full bg-accent/15 blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute -end-24 -top-24 size-80 glow-accent" />
         <div className="relative grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
             <p className="eyebrow mb-3">{t.home.tools.eyebrow}</p>
@@ -344,20 +348,35 @@ export default function HomePage({ lang }: { lang: Locale }) {
     <>
       <JsonLd data={faqJsonLd(lang)} />
       <Hero lang={lang} />
-      <Marquee lang={lang} />
-      <Proof lang={lang} />
-      <Featured lang={lang} />
-      <Services lang={lang} />
-      <Steps lang={lang} />
-      <Tools lang={lang} />
-      <Reviews lang={lang} />
-      <section className="container-x pt-16 md:pt-24" aria-labelledby="faq-title">
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <SectionHeading id="faq-title" eyebrow={t.home.faq.eyebrow} title={t.home.faq.title} />
-          <Faq lang={lang} />
-        </div>
-      </section>
-      <FinalCta lang={lang} />
+      {/* Each section below the first screen is its own Suspense boundary, so
+          React hydrates them as separate small tasks instead of one long one
+          (keeps the main thread free on slow phones). Nothing here suspends. */}
+      <Suspense>
+        <Marquee lang={lang} />
+        <Proof lang={lang} />
+      </Suspense>
+      <Suspense>
+        <Featured lang={lang} />
+      </Suspense>
+      <Suspense>
+        <Services lang={lang} />
+      </Suspense>
+      <Suspense>
+        <Steps lang={lang} />
+        <Tools lang={lang} />
+      </Suspense>
+      <Suspense>
+        <Reviews lang={lang} />
+      </Suspense>
+      <Suspense>
+        <section className="container-x pt-16 md:pt-24" aria-labelledby="faq-title">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+            <SectionHeading id="faq-title" eyebrow={t.home.faq.eyebrow} title={t.home.faq.title} />
+            <Faq lang={lang} />
+          </div>
+        </section>
+        <FinalCta lang={lang} />
+      </Suspense>
     </>
   );
 }

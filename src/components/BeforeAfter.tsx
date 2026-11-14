@@ -130,9 +130,9 @@ export default function BeforeAfter({
       onPointerUp={onPointerUp}
       onPointerCancel={() => (gesture.current = null)}
     >
-      <Image src={after.src} alt={after.alt[lang]} fill sizes={sizes} priority={priority} className="pointer-events-none object-cover" draggable={false} />
+      <Image src={after.src} alt={after.alt[lang]} fill sizes={sizes} preload={priority} fetchPriority={priority ? 'high' : undefined} loading={priority ? 'eager' : 'lazy'} className="pointer-events-none object-cover" draggable={false} />
       <div className="ba-before absolute inset-0">
-        <Image src={before.src} alt={before.alt[lang]} fill sizes={sizes} priority={priority} className="pointer-events-none object-cover" draggable={false} />
+        <Image src={before.src} alt={before.alt[lang]} fill sizes={sizes} preload={priority} fetchPriority={priority ? 'high' : undefined} loading={priority ? 'eager' : 'lazy'} className="pointer-events-none object-cover" draggable={false} />
       </div>
       <span className="pointer-events-none absolute start-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-extrabold tracking-wide text-white backdrop-blur" aria-hidden="true">
         {t.before}

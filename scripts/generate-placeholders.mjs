@@ -31,8 +31,6 @@ const BONE = '#F3F5EF';
 const pts = (list) => list.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
 const line = (list, width, color, extra = '') =>
   `<polyline points="${pts(list)}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
-const poly = (list, color, round = 0, extra = '') =>
-  `<polygon points="${pts(list)}" fill="${color}" stroke="${color}" stroke-width="${round}" stroke-linejoin="round" ${extra}/>`;
 const circle = (x, y, r, color, extra = '') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" ${extra}/>`;
 
 /** Deterministic random numbers, so every run draws the same pictures. */

@@ -24,7 +24,7 @@ const failures = [];
 for (const theme of themes) {
 await page.evaluateOnNewDocument((m) => { try { localStorage.setItem('theme', m); } catch {} }, theme);
 await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: theme === 'light' ? 'reduce' : 'no-preference' }]);
-for (const path of ROUTE_PATHS) {
+for (const path of [...ROUTE_PATHS, '/no-such-page', '/en/no-such-page']) {
   for (const width of widths) {
     await page.setViewport({ width, height: 800, isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
     await page.goto(base + path, { waitUntil: 'load' });
@@ -57,4 +57,4 @@ if (failures.length) {
   console.error(failures.join('\n'));
   process.exit(1);
 }
-console.log(`Layout OK: ${ROUTE_PATHS.length} pages × ${widths.length} widths × ${themes.length} themes, no horizontal overflow, one <h1> each.`);
+console.log(`Layout OK: ${ROUTE_PATHS.length + 2} pages (incl. the 404 in both languages) × ${widths.length} widths × ${themes.length} themes, no horizontal overflow, one <h1> each.`);

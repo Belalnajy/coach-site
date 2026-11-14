@@ -39,8 +39,3 @@ export const routeMetadata = (lang: Locale, key: Exclude<RouteKey, never>): Meta
   });
 };
 
-export const notFoundMetadata = (lang: Locale): Metadata => ({
-  title: dict(lang).meta.notFound.title,
-  description: dict(lang).meta.notFound.description,
-  robots: { index: false, follow: true },
-});
