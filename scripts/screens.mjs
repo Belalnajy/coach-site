@@ -21,8 +21,17 @@ for (const spec of shots) {
   await new Promise((r) => setTimeout(r, 800));
   await page.evaluate(() => document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible')));
   if (action === 'book') {
-    await page.click('nav[aria-label] a[href*="book"]').catch(() => {});
-    await new Promise((r) => setTimeout(r, 900));
+    await page.click('nav.fixed a[href*="book"]');
+    await new Promise((r) => setTimeout(r, 1500));
+    // Fill a little so the preview shows a real message.
+    const name = await page.$('dialog[open] input[name="name"]');
+    if (name) {
+      await page.click('dialog[open] label:has(input[value="online-monthly"])');
+      await name.type(path.startsWith('/en') ? 'Sarah' : 'سارة');
+      await page.click('dialog[open] summary');
+      await page.evaluate(() => document.querySelector('dialog[open] summary').scrollIntoView({ block: 'center' }));
+      await new Promise((r) => setTimeout(r, 400));
+    }
   }
   if (action === 'menu') {
     await page.click('button[aria-haspopup="dialog"]');

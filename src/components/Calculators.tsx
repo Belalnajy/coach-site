@@ -103,7 +103,7 @@ function NumberField({
           <button type="button" className="grid size-11 place-items-center rounded-full border border-line bg-surface text-ink transition active:scale-90" onClick={() => nudge(-step)} aria-label={fill(t.decrease, { field: label })}>
             <Icon name="minus" size={18} strokeWidth={2.6} />
           </button>
-          <div className="flex items-baseline gap-1 rounded-xl px-1" dir="ltr">
+          <div className="flex items-baseline gap-1 rounded-xl px-1">
             <input
               id={id}
               type="number"
@@ -217,7 +217,9 @@ export default function Calculators({ lang }: { lang: Locale }) {
   useEffect(() => {
     const el = resultRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => setResultVisible(entry.isIntersecting), { rootMargin: '0px 0px -90px 0px' });
+    // Only while the card is still below the screen: once it has been
+    // passed (footer), the pill would just be noise.
+    const observer = new IntersectionObserver(([entry]) => setResultVisible(entry.isIntersecting || entry.boundingClientRect.top < 0), { rootMargin: '0px 0px -90px 0px' });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);

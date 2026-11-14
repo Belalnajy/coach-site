@@ -16,7 +16,7 @@ export default function AboutPage({ lang }: { lang: Locale }) {
       <section className="relative overflow-hidden border-b border-line">
         <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-[-10%] size-[30rem] rounded-full bg-hot/15 blur-3xl" />
         <div className="container-x relative grid gap-8 py-10 md:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-14">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[2rem] border border-line lg:max-w-none">
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-[17rem] overflow-hidden rounded-[2rem] sm:max-w-sm border border-line lg:max-w-none">
             <Image src={coach.images.portrait.src} alt={coach.images.portrait.alt[lang]} fill priority sizes="(min-width: 1024px) 40vw, 90vw" className="object-cover" />
           </div>
           <div>

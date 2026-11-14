@@ -4,6 +4,7 @@ import { dict } from '@/lib/i18n';
 import { goalLabel } from '@/lib/config';
 import BeforeAfter from './BeforeAfter';
 import Icon from './Icon';
+import Numeric from './Numeric';
 import { quote } from '@/lib/format';
 
 /** One client's transformation: the slider and the story in numbers. */
@@ -26,13 +27,13 @@ export default function StoryCard({ story, lang, sizes, priority = false, hint =
                 {t.transformations.result}
               </span>
               <span className="num mt-1 block text-[2rem] leading-none text-accent-text">
-                <bdi>{story.result[lang]}</bdi>
+                <Numeric text={story.result[lang]} />
               </span>
             </dd>
             {story.detail && (
               <dd className="flex items-center gap-1.5 pb-0.5 text-sm font-semibold text-muted">
                 <Icon name="bolt" size={15} className="text-accent-text" />
-                <bdi>{story.detail[lang]}</bdi>
+                <Numeric text={story.detail[lang]} />
               </dd>
             )}
           </div>
@@ -45,7 +46,7 @@ export default function StoryCard({ story, lang, sizes, priority = false, hint =
             <dd className="mt-0.5 font-black">{goalLabel(story.goal, lang)}</dd>
           </div>
         </dl>
-        <blockquote className="mt-auto border-s-2 border-accent ps-3 text-pretty text-[0.95rem] leading-relaxed">{quote(story.quote[lang], lang)}</blockquote>
+        <blockquote className="border-s-2 border-accent ps-3 text-pretty text-[0.95rem] leading-relaxed">{quote(story.quote[lang], lang)}</blockquote>
       </div>
     </article>
   );

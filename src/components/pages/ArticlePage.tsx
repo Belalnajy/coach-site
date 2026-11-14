@@ -74,7 +74,7 @@ export default function ArticlePage({ lang, post }: { lang: Locale; post: Post }
         ])}
       />
       <header className="container-x max-w-3xl pt-8 md:pt-14">
-        <Link href={route(lang, 'blog')} className="inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-muted hover:text-ink">
+        <Link href={route(lang, 'blog')} className="flex min-h-11 w-fit items-center gap-1.5 text-sm font-bold text-muted hover:text-ink">
           <Icon name="arrow" size={16} className="rotate-180 rtl:rotate-0" />
           {t.blog.back}
         </Link>

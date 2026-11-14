@@ -50,7 +50,7 @@ function Hero({ lang }: { lang: Locale }) {
 
         <div className="relative z-10 pt-[30svh] pb-28 lg:p-0">
           <p className="eyebrow mb-4">{fill(t.home.eyebrow, { role: coach.role[lang] })}</p>
-          <h1 id="hero-title" className="display text-[2.6rem] min-[400px]:text-[2.9rem] sm:text-7xl lg:text-[5.6rem] xl:text-[6.2rem] rtl:text-[2.35rem] sm:rtl:text-6xl lg:rtl:text-7xl xl:rtl:text-[5rem]">
+          <h1 id="hero-title" className="display text-[2.6rem] min-[400px]:text-[2.9rem] sm:text-7xl lg:text-[4.4rem] xl:text-[5rem] rtl:text-[2.35rem] sm:rtl:text-6xl lg:rtl:text-[3.6rem] xl:rtl:text-[4.2rem]">
             <span className="block">{first}</span>
             {rest.map((line) => (
               <span key={line} className="block text-accent-text">
