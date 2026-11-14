@@ -33,6 +33,10 @@ for (const spec of shots) {
       await new Promise((r) => setTimeout(r, 400));
     }
   }
+  if (/^y\d+$/.test(action)) {
+    await page.evaluate((y) => window.scrollTo(0, y), Number(action.slice(1)));
+    await new Promise((r) => setTimeout(r, 600));
+  }
   if (action === 'menu') {
     await page.click('button[aria-haspopup="dialog"]');
     await new Promise((r) => setTimeout(r, 600));

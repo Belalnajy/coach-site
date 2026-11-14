@@ -362,6 +362,11 @@
 }
 
 @layer utilities {
+  /* Arabic needs room for its tall letters and dots: the size utilities
+     (text-6xl…) set line-height 1, which suits the Latin display face only. */
+  :lang(ar) .display {
+    line-height: 1.3;
+  }
   /* Long pages: sections below the first screen are laid out and painted
      only when they come near the viewport. `auto` remembers each section's
      real size once it has been rendered, so the scrollbar settles. */
