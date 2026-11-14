@@ -26,10 +26,13 @@ export interface BeforeAfterLabels {
  * measured width, in a sideways rail, after a resize or a rotation, in LTR
  * and RTL. Widths are only read during a gesture, at that moment.
  *
- * - Touch: drag the handle (a wide strip around the divider); a tap elsewhere
- *   on the picture jumps the divider there. Swipes on the picture are left to
- *   the browser, so a rail of cards scrolls sideways and the page scrolls.
+ * - Touch (and pen): ONLY a drag that starts on the handle moves the divider
+ *   (a 56px strip around the line, plus the round knob). The picture itself
+ *   ignores fingers entirely, tap or swipe: scrolling the page or the rail
+ *   with a finger on a photo can never move the divider.
  * - Mouse: press and drag anywhere on the picture.
+ *
+ * The frame takes the pair's own aspect ratio (whole photos, nothing cut).
  * - Keyboard: focus the handle; arrows, Home/End, Page Up/Down.
  *
  * With several views (front, side, back), buttons under the picture switch
@@ -58,9 +61,9 @@ export default function BeforeAfter({
   const [value, setValue] = useState(50);
   const pos = useRef(50);
   const drag = useRef<number | null>(null);
-  const tap = useRef<{ x: number; y: number; id: number } | null>(null);
   const [current, setCurrent] = useState(0);
   const { before, after } = views[current] ?? views[0];
+  const aspect = `${before.width} / ${before.height}`;
   const rtl = lang === 'ar';
 
   /** Moves the divider. While dragging, only the CSS variable changes (no render per frame). */
@@ -97,7 +100,6 @@ export default function BeforeAfter({
 
   const startDrag = (e: PointerEvent<HTMLElement>) => {
     drag.current = e.pointerId;
-    tap.current = null;
     e.currentTarget.setPointerCapture(e.pointerId);
   };
   // The handle strip: a drag from here moves the divider, for every pointer type.
@@ -106,33 +108,23 @@ export default function BeforeAfter({
     e.stopPropagation();
     startDrag(e);
   };
-  // The picture: a mouse drags from anywhere; a finger only taps (swipes scroll).
+  // The picture: only a mouse drags from here. Touch and pen are ignored.
   const onPictureDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === 'mouse') {
-      if (e.button !== 0) return;
-      startDrag(e);
-      apply(fromPointer(e.clientX), false);
-      return;
-    }
-    tap.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    startDrag(e);
+    apply(fromPointer(e.clientX), false);
   };
   const onMove = (e: PointerEvent<HTMLElement>) => {
     if (drag.current === e.pointerId) apply(fromPointer(e.clientX), false);
-    else if (tap.current && tap.current.id === e.pointerId && Math.hypot(e.clientX - tap.current.x, e.clientY - tap.current.y) > 10) tap.current = null;
   };
   const onUp = (e: PointerEvent<HTMLElement>) => {
-    if (drag.current === e.pointerId) {
-      drag.current = null;
-      apply(pos.current);
-      return;
-    }
-    if (tap.current && tap.current.id === e.pointerId) apply(fromPointer(e.clientX));
-    tap.current = null;
+    if (drag.current !== e.pointerId) return;
+    drag.current = null;
+    apply(pos.current);
   };
   const onCancel = () => {
     if (drag.current !== null) apply(pos.current);
     drag.current = null;
-    tap.current = null;
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -158,16 +150,18 @@ export default function BeforeAfter({
     <div>
       <div
         ref={root}
-        className="relative aspect-[2/3] cursor-ew-resize overflow-hidden rounded-[1.5rem] bg-surface-2 select-none"
-        style={{ ['--pos' as string]: `${value}%` }}
+        className="relative cursor-ew-resize overflow-hidden rounded-[1.5rem] bg-surface-2 select-none [touch-action:pan-x_pan-y]"
+        // Whole photos: the frame has the pair's own shape. A very tall pair is
+        // narrowed (centred) so it never grows taller than 72% of the screen.
+        style={{ ['--pos' as string]: `${value}%`, aspectRatio: aspect, width: `min(100%, calc(72svh * ${before.width} / ${before.height}))`, marginInline: 'auto' }}
         onPointerDown={onPictureDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
         onPointerCancel={onCancel}
       >
-        <Image src={after.src} alt={after.alt[lang]} fill sizes={sizes} preload={priority} fetchPriority={priority ? 'high' : undefined} loading={priority ? 'eager' : 'lazy'} className="pointer-events-none object-cover" draggable={false} />
+        <Image src={after.src} alt={after.alt[lang]} fill sizes={sizes} preload={priority} fetchPriority={priority ? 'high' : undefined} loading={priority ? 'eager' : 'lazy'} className="pointer-events-none object-contain" draggable={false} />
         <div className="ba-before absolute inset-0">
-          <Image src={before.src} alt={before.alt[lang]} fill sizes={sizes} preload={priority} fetchPriority={priority ? 'high' : undefined} loading={priority ? 'eager' : 'lazy'} className="pointer-events-none object-cover" draggable={false} />
+          <Image src={before.src} alt={before.alt[lang]} fill sizes={sizes} preload={priority} fetchPriority={priority ? 'high' : undefined} loading={priority ? 'eager' : 'lazy'} className="pointer-events-none object-contain" draggable={false} />
         </div>
         <span className="pointer-events-none absolute start-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-extrabold tracking-wide text-white backdrop-blur" aria-hidden="true">
           {t.before}

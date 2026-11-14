@@ -124,9 +124,16 @@ export default function AboutPage({ lang }: { lang: Locale }) {
           <h2 id="achievements-title" className="display mb-8 text-4xl sm:text-5xl">
             {t.about.achievementsTitle}
           </h2>
-          <ul className="space-y-6">
+          <div className={`grid gap-6 ${coach.images.poster ? 'lg:grid-cols-[22rem_1fr] lg:items-start' : ''}`}>
+          {/* The coach's poster, whole (its lettering is part of it). */}
+          {coach.images.poster && (
+            <div className="relative mx-auto w-full max-w-[22rem] overflow-hidden rounded-[1.5rem] border border-line bg-surface-2 lg:sticky lg:top-24" style={{ aspectRatio: `${coach.images.poster.width} / ${coach.images.poster.height}` }}>
+              <Image src={coach.images.poster.src} alt={coach.images.poster.alt[lang]} fill sizes="(min-width: 1024px) 22rem, (min-width: 400px) 22rem, 90vw" className="object-contain" />
+            </div>
+          )}
+          <ul className="min-w-0 space-y-6">
             {coach.achievements.map((a) => (
-              <li key={a.id} className="card grid gap-6 overflow-hidden p-3 md:grid-cols-[1.1fr_0.9fr] md:p-4">
+              <li key={a.id} className="card grid gap-6 overflow-hidden p-3 md:grid-cols-[1.1fr_0.9fr] md:p-4 lg:grid-cols-1 xl:grid-cols-[1.1fr_0.9fr]">
                 <div className={`grid gap-3 ${a.photos.length > 1 ? 'grid-cols-2' : ''}`}>
                   {a.photos.map((p) => (
                     <div key={p.src} className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] bg-surface-2">
@@ -146,6 +153,7 @@ export default function AboutPage({ lang }: { lang: Locale }) {
               </li>
             ))}
           </ul>
+          </div>
         </section>
       )}
 

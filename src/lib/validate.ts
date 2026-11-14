@@ -134,6 +134,7 @@ export const validateConfig = (config: SiteConfig): string[] => {
   picture('coach.ts', 'images.hero', coach.images.hero);
   picture('coach.ts', 'images.portrait', coach.images.portrait);
   if (coach.images.map) picture('coach.ts', 'images.map', coach.images.map);
+  if (coach.images.poster) picture('coach.ts', 'images.poster', coach.images.poster);
   if (!/^[A-Z]{3}$/.test(coach.currency.code)) fail('coach.ts', 'currency.code', 'must be a three-letter currency code like "EGP"', coach.currency.code);
   text('coach.ts', 'currency.label', coach.currency.label);
   if (coach.arabicDigits !== 'latn' && coach.arabicDigits !== 'arab') fail('coach.ts', 'arabicDigits', 'must be "latn" or "arab"', coach.arabicDigits);

@@ -225,6 +225,50 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
     await page.close();
   }
   console.log('✓ sliders: every handle starts at 50% (390/360, rotated, AR/EN, rail and grid); swipes scroll the rail');
+
+  // The owner's case on a real phone: scrolling the page vertically with a
+  // finger on a photo, and quick taps on a photo, must never move a divider.
+  // Raw touch events through CDP (Input.dispatchTouchEvent), on every card.
+  for (const path of ['/transformations', '/en/transformations', '/', '/en']) {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 3 });
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await page.goto(base + path, { waitUntil: 'load' });
+    await sleep(500);
+    const cdp = await page.createCDPSession();
+    const touch = (type, points) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points.map(([x, y]) => ({ x, y, id: 1, radiusX: 8, radiusY: 8, force: 1 })) });
+    const count = await page.$$eval('[data-ba-divider]', (els) => els.length);
+    for (let i = 0; i < count; i++) {
+      await page.$$eval('[data-ba-divider]', (els, n) => els[n].parentElement.scrollIntoView({ block: 'center', inline: 'center' }), i);
+      await sleep(400);
+      const box = await page.$$eval('[data-ba-divider]', (els, n) => {
+        const r = els[n].parentElement.getBoundingClientRect();
+        return { x: r.left, y: r.top, w: r.width, h: r.height };
+      }, i);
+      const midY = Math.min(box.y + box.h / 2, 600);
+      // Quick taps at 20% and 80% of the photo's width.
+      for (const f of [0.2, 0.8]) {
+        await touch('touchStart', [[box.x + box.w * f, midY]]);
+        await touch('touchEnd', []);
+        await sleep(120);
+      }
+      // A vertical scroll that starts on the photo.
+      const scrollBefore = await page.evaluate(() => scrollY);
+      const sx = box.x + box.w * 0.2;
+      await touch('touchStart', [[sx, midY]]);
+      for (let k = 1; k <= 10; k++) await touch('touchMove', [[sx + (k % 2), midY - k * 22]]);
+      await touch('touchEnd', []);
+      await sleep(500);
+      const scrolled = (await page.evaluate(() => scrollY)) - scrollBefore;
+      assert.ok(scrolled > 50, `${path} card ${i + 1}: a vertical swipe on the photo scrolls the page (${scrolled}px)`);
+      const at = await handles(page);
+      at.forEach((p, j) => assert.ok(Math.abs(p - 50) < 1, `${path}: after taps and a scroll on card ${i + 1}, card ${j + 1}'s handle is at ${p}% (expected 50%)`));
+      const aria = await page.$$eval('[role="slider"]', (els) => els.map((e) => e.getAttribute('aria-valuenow')));
+      assert.ok(aria.every((v) => v === '50'), `${path}: aria-valuenow stays 50 (${aria.join(',')})`);
+    }
+    await page.close();
+  }
+  console.log('✓ sliders: real touch taps (20%, 80%) and vertical scrolls on every photo never move a divider (AR/EN, results page and home rail)');
 }
 
 {

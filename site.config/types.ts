@@ -134,6 +134,11 @@ export interface CoachConfig {
     portrait: Picture;
     /** A map or gym picture for the location card. */
     map?: Picture;
+    /**
+     * A finished poster of the coach (name lettering included). Shown whole,
+     * never cropped: beside the achievements on About and in the home share image.
+     */
+    poster?: Picture;
   };
   currency: {
     /** ISO 4217 code, e.g. "EGP", "SAR", "AED", "USD". */

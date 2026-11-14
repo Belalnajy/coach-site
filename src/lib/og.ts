@@ -19,8 +19,8 @@ export const OG_CONTENT_TYPE = 'image/png';
 const W = OG_SIZE.width;
 const H = OG_SIZE.height;
 const PAD = 64;
-const ART_W = 430;
-const TEXT_W = W - ART_W - PAD * 2 + 10;
+/** Width of the picture column: the hero crop, or the whole poster at full height. */
+const DEFAULT_ART_W = 430;
 const FONTS = path.join(process.cwd(), 'src', 'assets', 'fonts');
 const FACE = {
   arHeavy: { file: path.join(FONTS, 'Cairo-Black.ttf'), name: 'Cairo Black' },
@@ -52,7 +52,11 @@ const titleSize = (title: string, rtl: boolean) => {
   return n <= 16 ? 128 : n <= 28 ? 112 : n <= 44 ? 92 : 76;
 };
 
-export const renderOg = async ({ lang, eyebrow, title, subtitle }: { lang: Locale; eyebrow: string; title: string; subtitle?: string }): Promise<Buffer> => {
+export const renderOg = async ({ lang, eyebrow, title, subtitle, poster = false }: { lang: Locale; eyebrow: string; title: string; subtitle?: string; /** Show the coach's poster whole (lettering included) instead of the hero crop. */ poster?: boolean }): Promise<Buffer> => {
+  const posterPic = poster ? coach.images.poster : undefined;
+  // The poster is shown whole at the card's full height; never cropped.
+  const ART_W = posterPic ? Math.round((H * posterPic.width) / posterPic.height) : DEFAULT_ART_W;
+  const TEXT_W = W - ART_W - PAD * 2 + 10;
   const rtl = lang === 'ar';
   const heavy = rtl ? FACE.arHeavy : FACE.enHeavy;
   const light = rtl ? FACE.arText : FACE.enText;
@@ -73,8 +77,8 @@ export const renderOg = async ({ lang, eyebrow, title, subtitle }: { lang: Local
     <rect x="0" y="${H - 10}" width="${W}" height="10" fill="${accent}"/>
   </svg>`);
 
-  const art = await sharp(path.join(process.cwd(), 'public', coach.images.hero.src)).resize(ART_W, H, { fit: 'cover', position: 'top' }).toBuffer();
-  const fade = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${ART_W}" height="${H}"><defs><linearGradient id="f" ${fadeDir} y1="0" y2="0"><stop offset="0" stop-color="${theme.dark.bg}" stop-opacity="1"/><stop offset="0.35" stop-color="${theme.dark.bg}" stop-opacity="0"/></linearGradient></defs><rect width="${ART_W}" height="${H}" fill="url(#f)"/><rect y="${H - 10}" width="${ART_W}" height="10" fill="${accent}"/></svg>`);
+  const art = await sharp(path.join(process.cwd(), 'public', (posterPic ?? coach.images.hero).src)).resize(ART_W, H, { fit: posterPic ? 'contain' : 'cover', position: 'top', background: theme.dark.bg }).toBuffer();
+  const fade = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${ART_W}" height="${H}"><defs><linearGradient id="f" ${fadeDir} y1="0" y2="0"><stop offset="0" stop-color="${theme.dark.bg}" stop-opacity="${posterPic ? 0.6 : 1}"/><stop offset="${posterPic ? 0.08 : 0.35}" stop-color="${theme.dark.bg}" stop-opacity="0"/></linearGradient></defs><rect width="${ART_W}" height="${H}" fill="url(#f)"/><rect y="${H - 10}" width="${ART_W}" height="10" fill="${accent}"/></svg>`);
 
   // Brand row: accent badge + name.
   const badge = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect width="56" height="56" rx="14" fill="${accent}"/><path d="M31 9 15 31h12l-2 16 16-22H29z" fill="${theme.onAccent}"/></svg>`);
@@ -117,7 +121,7 @@ export const renderOg = async ({ lang, eyebrow, title, subtitle }: { lang: Local
 export const routeOg = (lang: Locale, key: RouteKey) => {
   const t = dict(lang);
   const vars = { coach: coach.name[lang], role: coach.role[lang], intro: coach.intro[lang] };
-  if (key === 'home') return renderOg({ lang, eyebrow: coach.role[lang], title: coach.headline[lang].split('\n')[0], subtitle: coach.headline[lang].split('\n')[1] });
+  if (key === 'home') return renderOg({ lang, eyebrow: coach.role[lang], title: coach.headline[lang].split('\n')[0], subtitle: coach.headline[lang].split('\n')[1], poster: Boolean(coach.images.poster) });
   const titles: Record<Exclude<RouteKey, 'home'>, string> = {
     transformations: t.transformations.title,
     programs: t.programs.title,

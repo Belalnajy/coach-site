@@ -62,18 +62,26 @@ export const coach: CoachConfig = {
     },
   ],
 
+  // From his gym photo (scripts/coach-photo.mjs): the hero and portrait are
+  // a crop without the lettering; the poster is the whole photo.
   images: {
     hero: {
       src: '/images/coach/mohamed-nasser-hero.webp',
       width: 640,
       height: 800,
-      alt: { ar: 'الكابتن محمد ناصر', en: 'Coach Mohamed Nasser' },
+      alt: { ar: 'الكابتن محمد ناصر في الجيم', en: 'Coach Mohamed Nasser at the gym' },
     },
     portrait: {
-      src: '/images/coach/mohamed-nasser-portrait.webp',
-      width: 600,
-      height: 750,
-      alt: { ar: 'صورة الكابتن محمد ناصر', en: 'Portrait of Coach Mohamed Nasser' },
+      src: '/images/coach/mohamed-nasser-hero.webp',
+      width: 640,
+      height: 800,
+      alt: { ar: 'الكابتن محمد ناصر في الجيم', en: 'Coach Mohamed Nasser at the gym' },
+    },
+    poster: {
+      src: '/images/coach/mohamed-nasser-poster.webp',
+      width: 765,
+      height: 1024,
+      alt: { ar: 'بوستر الكابتن محمد ناصر في الجيم', en: 'Poster of Coach Mohamed Nasser at the gym' },
     },
   },
 
