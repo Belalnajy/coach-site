@@ -53,6 +53,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Versioned file names (cairo-arabic-v1.woff2): a new font gets a new name.
+        source: '/fonts/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
         source: '/images/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }],
       },

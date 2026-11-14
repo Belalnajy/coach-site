@@ -1,0 +1,38 @@
+/*
+ * Cairo for the Arabic pages, self-hosted from /public/fonts (SIL Open Font
+ * License). Not loaded through next/font on purpose: with two root layouts,
+ * Next attaches the first layout's next/font preloads to every page, so
+ * English visitors were downloading 65 KB of Arabic font. Here the files are
+ * preloaded by the Arabic layout only (see RootDocument). The variable font
+ * covers every weight; the two files are its Arabic and Latin subsets.
+ * Changing the Arabic font: replace the two files, rename them (-v2) so
+ * caches refresh, and update the names here and in RootDocument.
+ */
+@font-face {
+  font-family: Cairo;
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url('/fonts/cairo-arabic-v1.woff2') format('woff2');
+  unicode-range: U+06??, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: Cairo;
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url('/fonts/cairo-latin-v1.woff2') format('woff2');
+  unicode-range: U+00??, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Arial resized to Cairo's metrics, so text does not move when Cairo arrives. */
+@font-face {
+  font-family: 'Cairo Fallback';
+  src: local(Arial);
+  ascent-override: 137.65%;
+  descent-override: 60.32%;
+  line-gap-override: 0%;
+  size-adjust: 94.66%;
+}
+.font-cairo {
+  --font-body: 'Cairo', 'Cairo Fallback';
+}

@@ -13,7 +13,7 @@ export default function StoryCard({ story, lang, sizes, priority = false, hint =
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
   return (
     <article className="card flex h-full flex-col overflow-hidden p-2.5">
-      <BeforeAfter before={story.before} after={story.after} lang={lang} name={story.client[lang]} sizes={sizes} priority={priority} hint={hint} />
+      <BeforeAfter before={story.before} after={story.after} lang={lang} name={story.client[lang]} sizes={sizes} priority={priority} hint={hint} labels={{ before: t.transformations.before, after: t.transformations.after, slider: t.transformations.slider, sliderValue: t.transformations.sliderValue }} />
       <div className="flex flex-1 flex-col gap-4 p-3 pt-4">
         <div className="flex flex-wrap items-center gap-2">
           <Heading className="text-lg font-black">{story.client[lang]}</Heading>

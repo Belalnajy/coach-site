@@ -66,7 +66,7 @@ WebP or JPG at about 80% quality is plenty; the site resizes them for each scree
 #### Colours and fonts
 
 - **Colours:** `site.config/theme.ts` only. A bright accent (lime, yellow, cyan) needs a dark `onAccent`; a deep accent (blue, red, purple) needs white. `accentText` is the accent used as text, and on the light palette it is usually a darker shade.
-- **Fonts:** loaded and self-hosted by `next/font`, which needs them written out in code: `src/lib/fonts-ar.ts` (Arabic pages, default Cairo) and `src/lib/fonts-en.ts` (English pages, default Inter + Barlow Condensed). Swap the import and keep the `variable` names; update the names in `theme.ts` to match. The share images use the font files in `src/assets/fonts/`.
+- **Fonts:** English pages load Inter and Barlow Condensed through `next/font` in `src/lib/fonts-en.ts` (swap the import, keep the `variable` names). Arabic pages self-host Cairo: the two `.woff2` files in `public/fonts/` and their `@font-face` rules in `src/app/(ar)/cairo.css` (the comment there explains why it is not `next/font`); to change it, replace the files, bump the `-v1` in their names and update `cairo.css` and `PRELOAD_FONTS` in `src/lib/fonts-ar.ts`. Update the names in `theme.ts` to match (a test checks). The share images use the font files in `src/assets/fonts/`.
 
 #### Deploy to Vercel (free tier)
 
@@ -169,7 +169,7 @@ npm run dev
 #### الألوان والخطوط
 
 - **الألوان:** من `site.config/theme.ts` فقط. اللون الفاتح (ليموني، أصفر) يحتاج `onAccent` داكناً، واللون الغامق يحتاج أبيض.
-- **الخطوط:** في `src/lib/fonts-ar.ts` (العربية، افتراضياً Cairo) و `src/lib/fonts-en.ts` (الإنجليزية). غيّر الاستيراد واترك أسماء `variable` كما هي.
+- **الخطوط:** الإنجليزية من `src/lib/fonts-en.ts` (غيّر الاستيراد واترك أسماء `variable`). العربية (Cairo) مستضافة داخل الموقع: ملفان في `public/fonts/` وقواعدهما في `src/app/(ar)/cairo.css`؛ لتغييرها استبدل الملفين وغيّر `-v1` في الاسم وحدّث `cairo.css` و `PRELOAD_FONTS` في `src/lib/fonts-ar.ts`، ثم الأسماء في `theme.ts`.
 
 #### النشر على Vercel (مجاناً)
 

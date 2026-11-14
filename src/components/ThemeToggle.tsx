@@ -1,9 +1,6 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
-import type { Locale } from '@/lib/i18n';
-import { dict } from '@/lib/i18n';
-import { theme } from '@/lib/config';
 import Icon from './Icon';
 
 type Mode = 'dark' | 'light';
@@ -15,16 +12,19 @@ const subscribe = (notify: () => void) => {
   return () => observer.disconnect();
 };
 
-/** Switches dark/light and remembers the choice on this device. */
-export default function ThemeToggle({ lang, className = '' }: { lang: Locale; className?: string }) {
-  const mode = useSyncExternalStore(subscribe, read, () => theme.defaultMode);
-  const t = dict(lang).nav;
+/**
+ * Switches dark/light and remembers the choice on this device. Strings come
+ * in as props so this always-loaded component does not pull the whole
+ * config and both dictionaries into the browser bundle.
+ */
+export default function ThemeToggle({ labels, defaultMode, className = '' }: { labels: { toDark: string; toLight: string }; defaultMode: Mode; className?: string }) {
+  const mode = useSyncExternalStore(subscribe, read, () => defaultMode);
   const next: Mode = mode === 'dark' ? 'light' : 'dark';
   return (
     <button
       type="button"
       className={`grid size-11 place-items-center rounded-full text-ink transition hover:bg-surface-2 ${className}`}
-      aria-label={next === 'light' ? t.themeToLight : t.themeToDark}
+      aria-label={next === 'light' ? labels.toLight : labels.toDark}
       onClick={() => {
         document.documentElement.setAttribute('data-theme', next);
         try {

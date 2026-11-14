@@ -5,10 +5,10 @@ import Logo from '@/components/Logo';
 import { THEME_CSS, THEME_INIT } from '@/components/RootDocument';
 import type { Locale } from '@/lib/i18n';
 import { dict } from '@/lib/i18n';
-import { FONT_CLASSES as AR_FONTS } from '@/lib/fonts-ar';
-import { FONT_CLASSES as EN_FONTS } from '@/lib/fonts-en';
+import { FONT_CLASSES_404 } from '@/lib/fonts-404';
 import { route, type RouteKey } from '@/lib/routes';
 import './globals.css';
+import './(ar)/cairo.css';
 
 /**
  * The 404 page for every unknown address. Each language has its own root
@@ -35,7 +35,7 @@ const LINKS: { key: RouteKey; icon: 'home' | 'dumbbell' | 'results' | 'calculato
 function Version({ lang }: { lang: Locale }) {
   const t = dict(lang);
   return (
-    <div className={`nf-${lang}`} lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`nf-${lang} ${FONT_CLASSES_404[lang]} font-sans`} lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <header className="container-x flex h-16 items-center">
         <Logo lang={lang} />
       </header>
@@ -67,7 +67,7 @@ export default function GlobalNotFound() {
         <script dangerouslySetInnerHTML={{ __html: `${THEME_INIT};${LANGUAGE_SWITCH}` }} />
         <style dangerouslySetInnerHTML={{ __html: `${THEME_CSS}\nhtml[lang=en] .nf-ar,html[lang=ar] .nf-en{display:none}` }} />
       </head>
-      <body className={`${AR_FONTS} ${EN_FONTS} antialiased`}>
+      <body className="antialiased">
         <Version lang="ar" />
         <Version lang="en" />
       </body>

@@ -34,7 +34,6 @@ function Hero({ lang }: { lang: Locale }) {
               preload
               fetchPriority="high"
               loading="eager"
-              decoding="sync"
               quality={60}
               sizes="(min-width: 1024px) 45vw, 100vw"
               className="object-cover object-[50%_8%] lg:object-[50%_20%]"
@@ -93,7 +92,7 @@ function Marquee({ lang }: { lang: Locale }) {
     </ul>
   );
   return (
-    <div className="relative z-10 overflow-hidden py-4">
+    <div className="relative z-10 overflow-hidden py-4" data-marquee>
       <div className="-mx-4 -rotate-2 border-y-2 border-on-accent/20 bg-accent py-3 text-on-accent">
         <div className="marquee-track flex w-max">
           {row(false)}
@@ -112,7 +111,7 @@ function Proof({ lang }: { lang: Locale }) {
     { value: coach.stats.transformations, label: t.transformations, icon: 'results' },
   ];
   return (
-    <section aria-label={t.label} className="container-x pt-14 md:pt-20">
+    <section aria-label={t.label} className="cv-auto container-x pt-14 md:pt-20">
       <dl className="grid grid-cols-3 gap-2 md:gap-4" data-reveal>
         {stats.map((s) => (
           <div key={s.label} className="card flex flex-col items-center gap-1 px-2 py-5 text-center md:items-start md:px-7 md:py-7 md:text-start">
@@ -135,7 +134,7 @@ function Featured({ lang }: { lang: Locale }) {
   const t = dict(lang);
   const stories = transformations.filter((s) => s.featured).slice(0, 3);
   return (
-    <section className="container-x py-16 md:py-24" aria-labelledby="featured-title">
+    <section className="cv-auto container-x py-16 md:py-24" aria-labelledby="featured-title">
       <SectionHeading
         id="featured-title"
         eyebrow={t.home.featured.eyebrow}
@@ -178,7 +177,7 @@ function Services({ lang }: { lang: Locale }) {
     ...packages.filter((p) => !p.popular),
   ].slice(0, 3);
   return (
-    <section className="relative overflow-hidden border-y border-line bg-surface/40 py-16 md:py-24" aria-labelledby="services-title">
+    <section className="cv-auto relative overflow-hidden border-y border-line bg-surface/40 py-16 md:py-24" aria-labelledby="services-title">
       <div className="container-x">
         <SectionHeading
           id="services-title"
@@ -211,7 +210,7 @@ function Services({ lang }: { lang: Locale }) {
 function Steps({ lang }: { lang: Locale }) {
   const t = dict(lang).home.steps;
   return (
-    <section className="container-x py-16 md:py-24" aria-labelledby="steps-title">
+    <section className="cv-auto container-x py-16 md:py-24" aria-labelledby="steps-title">
       <SectionHeading id="steps-title" eyebrow={t.eyebrow} title={t.title} />
       <ol className="grid gap-3 md:grid-cols-4 md:gap-5" data-reveal>
         {t.items.map((step, i) => (
@@ -240,7 +239,7 @@ function Tools({ lang }: { lang: Locale }) {
     { id: 'bodyfat', label: t.calculators.tabs.bodyfat, icon: 'calculator', text: t.calculators.blurbs.bodyfat },
   ];
   return (
-    <section className="container-x pb-16 md:pb-24" aria-labelledby="tools-title">
+    <section className="cv-auto container-x pb-16 md:pb-24" aria-labelledby="tools-title">
       <div className="relative overflow-hidden rounded-[2rem] border border-line bg-surface p-6 md:p-12" data-reveal>
         <div aria-hidden="true" className="pointer-events-none absolute -end-24 -top-24 size-80 glow-accent" />
         <div className="relative grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
@@ -285,7 +284,7 @@ function Reviews({ lang }: { lang: Locale }) {
   const t = dict(lang);
   if (!testimonials.length) return null;
   return (
-    <section className="overflow-hidden border-y border-line bg-surface/40 py-16 md:py-24" aria-labelledby="reviews-title">
+    <section className="cv-auto overflow-hidden border-y border-line bg-surface/40 py-16 md:py-24" aria-labelledby="reviews-title">
       <div className="container-x">
         <SectionHeading id="reviews-title" eyebrow={t.home.testimonials.eyebrow} title={t.home.testimonials.title} />
         <ul className="rail md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:p-0 md:m-0 lg:grid-cols-4" data-reveal>
@@ -322,7 +321,7 @@ function Reviews({ lang }: { lang: Locale }) {
 function FinalCta({ lang }: { lang: Locale }) {
   const t = dict(lang).home.final;
   return (
-    <section className="container-x pt-16 pb-16 md:pt-24 md:pb-24" aria-labelledby="final-title">
+    <section className="cv-auto container-x pt-16 pb-16 md:pt-24 md:pb-24" aria-labelledby="final-title">
       <div className="relative overflow-hidden rounded-[2rem] bg-accent px-6 py-12 text-on-accent md:px-14 md:py-16" data-reveal>
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(115deg,transparent_0_28px,rgb(0_0_0/0.06)_28px_44px)]" />
         <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -369,7 +368,7 @@ export default function HomePage({ lang }: { lang: Locale }) {
         <Reviews lang={lang} />
       </Suspense>
       <Suspense>
-        <section className="container-x pt-16 md:pt-24" aria-labelledby="faq-title">
+        <section className="cv-auto container-x pt-16 md:pt-24" aria-labelledby="faq-title">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
             <SectionHeading id="faq-title" eyebrow={t.home.faq.eyebrow} title={t.home.faq.title} />
             <Faq lang={lang} />

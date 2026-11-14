@@ -98,7 +98,10 @@ test('the font names in theme.ts match the fonts actually loaded', () => {
   const loader = (name: string) => name.replace(/ /g, '_'); // next/font/google export names
   const ar = fs.readFileSync('src/lib/fonts-ar.ts', 'utf8');
   const en = fs.readFileSync('src/lib/fonts-en.ts', 'utf8');
-  assert.match(ar, new RegExp(`\\b${loader(site.theme.fonts.arabic)}\\(`), `fonts-ar.ts loads ${site.theme.fonts.arabic}`);
+  // The Arabic face is self-hosted (src/app/(ar)/cairo.css), and its files must exist.
+  const arCss = fs.readFileSync('src/app/(ar)/cairo.css', 'utf8');
+  assert.match(arCss, new RegExp(`font-family: '?${site.theme.fonts.arabic}'?;`), `cairo.css declares ${site.theme.fonts.arabic}`);
+  for (const [, file] of arCss.matchAll(/url\('(\/fonts\/[^']+)'\)/g)) assert.ok(fs.existsSync(path.join('public', file)), `public${file} exists`);
   assert.match(en, new RegExp(`\\b${loader(site.theme.fonts.latin)}\\(`), `fonts-en.ts loads ${site.theme.fonts.latin}`);
   for (const file of [ar, en]) assert.match(file, new RegExp(`\\b${loader(site.theme.fonts.display)}\\(`), `both trees load ${site.theme.fonts.display}`);
 });

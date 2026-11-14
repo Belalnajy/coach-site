@@ -1,18 +1,14 @@
-import { Barlow_Condensed, Cairo } from 'next/font/google';
+import { Barlow_Condensed } from 'next/font/google';
 
 /**
- * Arabic pages: Cairo for all text and the display face for Latin numbers.
- * Each language tree has its own font module so a page preloads only what
- * its first screen needs:
- * - Cairo: both subsets are preloaded. Arabic text needs the Latin one too
- *   (spaces, full stops and digits live there); loading it late reflows the
- *   hero text and shows up as layout shift.
- * - The display face only draws numbers on Arabic pages, all below the
- *   first screen on phones, so it is not preloaded here.
- * To change the Arabic font, swap `Cairo` for another next/font/google family
- * (e.g. IBM_Plex_Sans_Arabic, Tajawal) and keep `variable: '--font-body'`.
+ * Arabic pages: Cairo for all text (self-hosted, see src/app/(ar)/cairo.css
+ * for why it is not loaded through next/font) and the display face for Latin
+ * numbers, which on Arabic pages sit below the first screen and so are not
+ * preloaded.
  */
-const body = Cairo({ subsets: ['arabic', 'latin'], variable: '--font-body', display: 'swap' });
 const display = Barlow_Condensed({ subsets: ['latin'], weight: '800', style: 'italic', variable: '--font-display-latin', display: 'swap', preload: false });
 
-export const FONT_CLASSES = `${body.variable} ${display.variable}`;
+export const FONT_CLASSES = `font-cairo ${display.variable}`;
+
+/** Preloaded by the Arabic layout: both are needed for the first screen. */
+export const PRELOAD_FONTS = ['/fonts/cairo-arabic-v1.woff2', '/fonts/cairo-latin-v1.woff2'];

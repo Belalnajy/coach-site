@@ -131,8 +131,8 @@ export interface ThemeConfig {
   light: Palette;
   /**
    * Fonts are loaded by next/font, which needs them written out in code, so
-   * the choice itself lives in src/lib/fonts-ar.ts and fonts-en.ts. These names are
-   * only used to check that file and the config agree.
+   * the choice itself lives in src/app/(ar)/cairo.css (Arabic, self-hosted)
+   * and src/lib/fonts-en.ts. A unit test checks these names match them.
    */
   fonts: {
     arabic: string;

@@ -362,11 +362,23 @@
 }
 
 @layer utilities {
+  /* Long pages: sections below the first screen are laid out and painted
+     only when they come near the viewport. `auto` remembers each section's
+     real size once it has been rendered, so the scrollbar settles. */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
   .text-balance {
     text-wrap: balance;
   }
   .text-pretty {
     text-wrap: pretty;
+  }
+  /* Opaque enough to read over anything, without a backdrop blur: blurring
+     what scrolls underneath costs a repaint every frame on slower phones. */
+  .solid-bar {
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
   }
   .glass {
     background: color-mix(in srgb, var(--bg) 72%, transparent);
@@ -427,8 +439,13 @@
     transform: translateX(50%);
   }
 }
+/* Runs only once the band has scrolled into view (RevealObserver adds
+   .is-visible), so nothing animates while the page is loading. */
 .marquee-track {
-  animation: marquee 28s linear infinite;
+  animation: marquee 28s linear infinite paused;
+}
+.is-visible .marquee-track {
+  animation-play-state: running;
 }
 [dir='rtl'] .marquee-track {
   animation-name: marquee-rtl;

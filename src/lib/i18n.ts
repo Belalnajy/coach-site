@@ -9,9 +9,8 @@ export const DEFAULT_LOCALE: Locale = 'ar';
 const DICTS = { ar, en };
 export const dict = (lang: Locale) => DICTS[lang];
 
-/** "Hi {coach}" + { coach: "Adam" } → "Hi Adam". Unknown keys are left as they are. */
-export const fill = (template: string, values: Record<string, string | number>): string =>
-  template.replace(/\{(\w+)\}/g, (match, key: string) => (key in values ? String(values[key]) : match));
+// Kept in its own module so client code can use it without the dictionaries.
+export { fill } from './fill.ts';
 
 /** Picks one language out of a { ar, en } pair. */
 export const pick = (value: Localized, lang: Locale): string => value[lang];

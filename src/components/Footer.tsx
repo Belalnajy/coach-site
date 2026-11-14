@@ -12,7 +12,7 @@ import Socials from './Socials';
 export default function Footer({ lang }: { lang: Locale }) {
   const t = dict(lang);
   return (
-    <footer className="border-t border-line bg-surface pt-14 pb-32 lg:pb-12">
+    <footer className="cv-auto border-t border-line bg-surface pt-14 pb-32 lg:pb-12">
       <div className="container-x grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo lang={lang} />

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { preload } from 'react-dom';
 import type { Locale } from '@/lib/i18n';
 import { theme } from '@/lib/config';
 import { siteJsonLd } from '@/lib/jsonld';
@@ -28,7 +29,9 @@ export const THEME_INIT = `(function(d){d.classList.add('js');try{var m=localSto
  * root layout (src/app/(ar)/layout.tsx, src/app/en/layout.tsx), so the
  * server HTML already carries the right lang and dir.
  */
-export default function RootDocument({ lang, fontClasses, children }: { lang: Locale; fontClasses: string; children: ReactNode }) {
+export default function RootDocument({ lang, fontClasses, preloadFonts = [], children }: { lang: Locale; fontClasses: string; preloadFonts?: string[]; children: ReactNode }) {
+  // Self-hosted fonts the first screen needs (React puts these in <head>).
+  for (const href of preloadFonts) preload(href, { as: 'font', type: 'font/woff2', crossOrigin: '' });
   return (
     <html lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'} data-theme={theme.defaultMode} suppressHydrationWarning>
       <head>

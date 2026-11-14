@@ -2,9 +2,17 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import type { Picture } from '../../site.config/types';
-import type { Locale } from '@/lib/i18n';
-import { dict, fill } from '@/lib/i18n';
+import type { Locale, Picture } from '../../site.config/types';
+import { fill } from '@/lib/fill';
+
+export interface BeforeAfterLabels {
+  before: string;
+  after: string;
+  /** "Before and after comparison: {name}" */
+  slider: string;
+  /** "Before {before}%, after {after}%" */
+  sliderValue: string;
+}
 
 /**
  * Before/after comparison. "Before" sits on the reading-start side (left in
@@ -23,6 +31,7 @@ export default function BeforeAfter({
   sizes,
   priority = false,
   hint = false,
+  labels: t,
 }: {
   before: Picture;
   after: Picture;
@@ -32,8 +41,9 @@ export default function BeforeAfter({
   priority?: boolean;
   /** Play a short left-right nudge the first time it scrolls into view. */
   hint?: boolean;
+  /** Strings from the page's dictionary (passed in so the slider ships without them). */
+  labels: BeforeAfterLabels;
 }) {
-  const t = dict(lang).transformations;
   const root = useRef<HTMLDivElement>(null);
   const pos = useRef(50);
   const gesture = useRef<{ x: number; y: number; id: number; dragging: boolean } | null>(null);
