@@ -93,3 +93,12 @@ test('Arabic and English interface texts have the same keys', () => {
   assert.equal(ar.days.length, 7);
   assert.equal(en.days.length, 7);
 });
+
+test('the font names in theme.ts match the fonts actually loaded', () => {
+  const loader = (name: string) => name.replace(/ /g, '_'); // next/font/google export names
+  const ar = fs.readFileSync('src/lib/fonts-ar.ts', 'utf8');
+  const en = fs.readFileSync('src/lib/fonts-en.ts', 'utf8');
+  assert.match(ar, new RegExp(`\\b${loader(site.theme.fonts.arabic)}\\(`), `fonts-ar.ts loads ${site.theme.fonts.arabic}`);
+  assert.match(en, new RegExp(`\\b${loader(site.theme.fonts.latin)}\\(`), `fonts-en.ts loads ${site.theme.fonts.latin}`);
+  for (const file of [ar, en]) assert.match(file, new RegExp(`\\b${loader(site.theme.fonts.display)}\\(`), `both trees load ${site.theme.fonts.display}`);
+});
