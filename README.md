@@ -47,7 +47,9 @@ Then edit the files below, top to bottom. Every file is commented, and `npm run 
 | 7 | `site.config/posts/*.md`, `blog.ts` | 3 min | Keep, edit or delete the sample articles; one file per article holds both languages (see any existing file) |
 | 8 | `public/images/coach/` | — | Replace the hero, portrait and map pictures (sizes below) |
 
-Finally set `sample: false` in `coach.ts` (the build then refuses any story or review still marked as sample), run the checks, and deploy.
+Finally set `sample: false` in `coach.ts` (the build then refuses any story or review still marked as sample, and any of the template's placeholder phone, addresses, names or sample pictures), run the checks, and deploy.
+
+While `sample` is `true`, every page carries `noindex` and the structured data leaves out the person, gym, phone and prices, so the made-up coach never reaches search engines. To publish the template itself as a demo (for a portfolio), build with `INDEX_SAMPLE=true`.
 
 #### Pictures: exact sizes
 
@@ -154,7 +156,9 @@ npm run dev
 | 7 | `site.config/posts/*.md` | 3 دقائق | عدّل المقالات أو احذفها؛ كل ملف يحمل اللغتين |
 | 8 | `public/images/coach/` | — | استبدل صور الواجهة والبورتريه والخريطة |
 
-في النهاية اضبط `sample: false` في `coach.ts` (سيرفض البناء أي قصة أو رأي ما زال تجريبياً)، شغّل الفحوصات، وانشر.
+في النهاية اضبط `sample: false` في `coach.ts` (سيرفض البناء أي قصة أو رأي ما زال تجريبياً، وأي رقم أو عنوان أو اسم أو صورة تجريبية من القالب)، شغّل الفحوصات، وانشر.
+
+طالما `sample` يساوي `true` تحمل كل الصفحات `noindex` ولا تُنشر بيانات المدرب أو الجيم أو الهاتف أو الأسعار كبيانات منظمة، حتى لا يصل المدرب الوهمي إلى محركات البحث. لنشر القالب نفسه كعرض (في معرض أعمال) ابنِه مع `INDEX_SAMPLE=true`.
 
 #### مقاسات الصور
 

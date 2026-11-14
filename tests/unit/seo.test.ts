@@ -2,14 +2,20 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { coach } from '../../src/lib/config.ts';
 import { faqJsonLd, offersJsonLd, siteJsonLd } from '../../src/lib/jsonld.ts';
-import { rootMetadata } from '../../src/lib/page-meta.ts';
+import { rootMetadata, sampleHidden } from '../../src/lib/page-meta.ts';
 import { dict } from '../../src/lib/i18n.ts';
 
 const types = (items: { '@type': string }[]) => items.map((i) => i['@type']);
 
 test('while the site shows sample content, search engines are kept out', () => {
   assert.equal(coach.sample, true);
+  delete process.env.INDEX_SAMPLE;
+  assert.equal(sampleHidden(), true);
   for (const lang of ['ar', 'en'] as const) assert.deepEqual(rootMetadata(lang).robots, { index: false, follow: false });
+  // A public demo of the template can opt in explicitly.
+  process.env.INDEX_SAMPLE = 'true';
+  assert.equal(rootMetadata('en').robots, undefined);
+  delete process.env.INDEX_SAMPLE;
 });
 
 test('sample content publishes no person, business, phone, address or prices as structured data', () => {

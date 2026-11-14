@@ -57,7 +57,7 @@ try {
       if (!html.includes('og:image')) return 'missing share image';
       if ((html.match(/<h1[\s>]/g) || []).length !== 1) return 'expected exactly one <h1>';
       // The template's sample coach: hidden from search, no fake business data.
-      if (coach.sample && !html.includes('<meta name="robots" content="noindex, nofollow"/>')) return 'sample content must be noindex';
+      if (coach.sample && process.env.INDEX_SAMPLE !== 'true' && !html.includes('<meta name="robots" content="noindex, nofollow"/>')) return 'sample content must be noindex';
       if (coach.sample && /"@type":"(SportsActivityLocation|OfferCatalog)"|"telephone"|"jobTitle"/.test(html)) return 'sample content must not publish person/business structured data';
       return null;
     });

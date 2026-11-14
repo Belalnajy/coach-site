@@ -7,6 +7,9 @@ import { pageMetadata } from './seo.ts';
 
 const vars = (lang: Locale) => ({ coach: coach.name[lang], role: coach.role[lang], intro: coach.intro[lang] });
 
+/** true while sample content must be kept out of search engines. */
+export const sampleHidden = (): boolean => coach.sample && process.env.INDEX_SAMPLE !== 'true';
+
 /** Shared by both root layouts. */
 export const rootMetadata = (lang: Locale): Metadata => ({
   metadataBase: new URL(coach.siteUrl),
@@ -15,8 +18,10 @@ export const rootMetadata = (lang: Locale): Metadata => ({
   authors: [{ name: coach.name[lang] }],
   formatDetection: { telephone: false },
   appleWebApp: { capable: true, title: coach.shortName[lang], statusBarStyle: 'black-translucent' },
-  // The template's made-up coach must never show up in search results.
-  ...(coach.sample ? { robots: { index: false, follow: false } } : {}),
+  // The template's made-up coach stays out of search results. A public demo
+  // of the template (a portfolio showcase) can opt in with INDEX_SAMPLE=true
+  // at build time; a real coach (sample: false) is always indexable.
+  ...(sampleHidden() ? { robots: { index: false, follow: false } } : {}),
 });
 
 export const rootViewport: Viewport = {

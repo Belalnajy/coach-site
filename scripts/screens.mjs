@@ -20,6 +20,19 @@ for (const spec of shots) {
   await page.goto(base + path, { waitUntil: 'load', timeout: 60000 });
   await new Promise((r) => setTimeout(r, 800));
   await page.evaluate(() => document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible')));
+  if (action === 'bookend') {
+    // Open the sheet with a real tap, pick a few options, then scroll the
+    // sheet to its end with the wheel: the Send footer must still be there.
+    const tab = await (await page.$('nav.fixed a[href*="book"]')).boundingBox();
+    await page.touchscreen.tap(tab.x + tab.width / 2, tab.y + tab.height / 2);
+    await new Promise((r) => setTimeout(r, 1500));
+    for (const value of ['online-monthly', '0', 'evening', 'fat-loss']) await page.click(`dialog[open] label:has(input[value="${value}"])`);
+    await page.type('dialog[open] input[name="name"]', path.startsWith('/en') ? 'Sarah' : 'سارة');
+    const area = await (await page.$('dialog[open] [data-scroll-area]')).boundingBox();
+    await page.mouse.move(area.x + area.width / 2, area.y + area.height / 2);
+    for (let i = 0; i < 8; i++) await page.mouse.wheel({ deltaY: 400 });
+    await new Promise((r) => setTimeout(r, 800));
+  }
   if (action === 'book') {
     await page.click('nav.fixed a[href*="book"]');
     await new Promise((r) => setTimeout(r, 1500));
