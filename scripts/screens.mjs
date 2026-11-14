@@ -20,6 +20,26 @@ for (const spec of shots) {
   await page.goto(base + path, { waitUntil: 'load', timeout: 60000 });
   await new Promise((r) => setTimeout(r, 800));
   await page.evaluate(() => document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible')));
+  if (action === 'drag') {
+    // A before/after slider caught mid-drag (pointer still down).
+    await page.$eval('[role="slider"]', (el) => el.closest('article').scrollIntoView({ block: 'center' }));
+    await new Promise((r) => setTimeout(r, 500));
+    const box = await page.$eval('.ba-before', (el) => {
+      const r = el.parentElement.getBoundingClientRect();
+      return { x: r.left, y: r.top, w: r.width, h: r.height };
+    });
+    const y = box.y + box.h * 0.6;
+    await page.mouse.move(box.x + box.w * 0.5, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.w * 0.62, y, { steps: 4 });
+    await page.mouse.move(box.x + box.w * 0.7, y, { steps: 4 });
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  if (/^#/.test(action)) {
+    await page.$eval(action, (el) => el.scrollIntoView({ block: 'start' }));
+    await page.evaluate(() => window.scrollBy(0, -70));
+    await new Promise((r) => setTimeout(r, 600));
+  }
   if (action === 'bookend') {
     // Open the sheet with a real tap, pick a few options, then scroll the
     // sheet to its end with the wheel: the Send footer must still be there.
