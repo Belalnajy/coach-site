@@ -19,7 +19,7 @@ export const packages: PackageConfig[] = [
       ar: 'برنامج تمرين وتغذية يتحدّث كل أسبوع حسب تقدّمك.',
       en: 'A training and nutrition plan updated every week as you progress.',
     },
-    price: 1200,
+    price: 1000,
     per: { ar: 'شهرياً', en: 'per month' },
     features: [
       { ar: 'برنامج تمرين مصمم لك (جيم أو بيت)', en: 'Training plan built for you (gym or home)' },
@@ -38,11 +38,10 @@ export const packages: PackageConfig[] = [
       ar: 'ثلاث مراحل واضحة بهدف واحد ومقاسات قبل وبعد.',
       en: 'Three clear phases, one goal, with before and after measurements.',
     },
-    price: 3000,
+    price: 2000,
     per: { ar: 'دفعة واحدة', en: 'one-time' },
     features: [
       { ar: 'كل ما في المتابعة الشهرية', en: 'Everything in monthly coaching' },
-      { ar: 'مكالمة فيديو كل أسبوعين', en: 'Video call every two weeks' },
       { ar: 'تحليل وضعيات التمرين بالفيديو', en: 'Form review on your videos' },
       { ar: 'تقرير تقدّم في نهاية كل مرحلة', en: 'Progress report after each phase' },
     ],
