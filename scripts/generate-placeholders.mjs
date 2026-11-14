@@ -53,7 +53,7 @@ const svg = (w, h, body, defs = '') =>
 const label = async (text, { size, color = BONE, alpha = 1, heavy = false, spacing = 0 }) => {
   const pt = Math.round(size * 1024 * 0.75);
   const markup = `<span size="${pt}" foreground="${color}" ${alpha < 1 ? `alpha="${Math.round(alpha * 100)}%"` : ''} letter_spacing="${Math.round(spacing * 1024)}">${text}</span>`;
-  return sharp({ text: { text: markup, fontfile: heavy ? FONT_HEAVY : FONT, font: heavy ? 'Barlow Condensed ExtraBold Italic' : 'Barlow Condensed SemiBold', rgba: true, dpi: 72 } })
+  return sharp({ text: { text: markup, fontfile: heavy ? FONT_HEAVY : FONT, font: heavy ? 'Barlow Condensed ExtraBold, Italic' : 'Barlow Condensed SemiBold,', rgba: true, dpi: 72 } })
     .png()
     .toBuffer();
 };

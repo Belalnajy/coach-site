@@ -25,13 +25,17 @@ const FONTS = path.join(process.cwd(), 'src', 'assets', 'fonts');
 const FACE = {
   arHeavy: { file: path.join(FONTS, 'Cairo-Black.ttf'), name: 'Cairo Black' },
   arText: { file: path.join(FONTS, 'Cairo-SemiBold.ttf'), name: 'Cairo SemiBold' },
-  enHeavy: { file: path.join(FONTS, 'BarlowCondensed-ExtraBoldItalic.ttf'), name: 'Barlow Condensed ExtraBold Italic' },
-  enText: { file: path.join(FONTS, 'BarlowCondensed-SemiBold.ttf'), name: 'Barlow Condensed SemiBold' },
+  enHeavy: { file: path.join(FONTS, 'BarlowCondensed-ExtraBoldItalic.ttf'), name: 'Barlow Condensed ExtraBold, Italic' },
+  enText: { file: path.join(FONTS, 'BarlowCondensed-SemiBold.ttf'), name: 'Barlow Condensed SemiBold,' },
 };
 
 const escape = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-/** A block of text as a transparent PNG, wrapped to `width`. */
+/**
+ * A block of text as a transparent PNG, wrapped to `width`. Font names end
+ * with a comma so Pango reads the whole thing as the family name ("Barlow
+ * Condensed ExtraBold") instead of taking "ExtraBold" as a weight.
+ */
 const text = async (content: string, { face, size, color, width, lineHeight = 1, rtl }: { face: { file: string; name: string }; size: number; color: string; width: number; lineHeight?: number; rtl: boolean }) => {
   const markup = `<span size="${Math.round(size * 1024 * 0.75)}" foreground="${color}" line_height="${lineHeight}">${escape(content)}</span>`;
   const { data, info } = await sharp({
@@ -45,7 +49,7 @@ const text = async (content: string, { face, size, color, width, lineHeight = 1,
 const titleSize = (title: string, rtl: boolean) => {
   const n = title.length;
   if (rtl) return n <= 18 ? 74 : n <= 32 ? 62 : n <= 48 ? 52 : 44;
-  return n <= 16 ? 104 : n <= 28 ? 88 : n <= 44 ? 72 : 60;
+  return n <= 16 ? 128 : n <= 28 ? 112 : n <= 44 ? 92 : 76;
 };
 
 export const renderOg = async ({ lang, eyebrow, title, subtitle }: { lang: Locale; eyebrow: string; title: string; subtitle?: string }): Promise<Buffer> => {
