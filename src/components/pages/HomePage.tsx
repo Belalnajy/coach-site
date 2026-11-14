@@ -10,6 +10,7 @@ import { route } from '@/lib/routes';
 import BookLink from '../BookLink';
 import Faq from '../Faq';
 import Icon, { type IconName } from '../Icon';
+import Numeric from '../Numeric';
 import JsonLd from '../JsonLd';
 import PackageCard from '../PackageCard';
 import SectionHeading from '../SectionHeading';
@@ -109,7 +110,7 @@ function Marquee({ lang }: { lang: Locale }) {
 
 function Proof({ lang }: { lang: Locale }) {
   const t = dict(lang).home.proof;
-  // Only the numbers the coach has given.
+  // Only the numbers the coach has given, plus a competition result if any.
   const stats = (
     [
       { value: coach.stats?.yearsExperience, label: t.years, icon: 'award' },
@@ -117,10 +118,12 @@ function Proof({ lang }: { lang: Locale }) {
       { value: coach.stats?.transformations, label: t.transformations, icon: 'results' },
     ] as { value: number | undefined; label: string; icon: IconName }[]
   ).filter((s): s is { value: number; label: string; icon: IconName } => s.value !== undefined);
-  if (!stats.length) return null;
+  const achievement = coach.achievements?.[0];
+  const count = stats.length + (achievement ? 1 : 0);
+  if (!count) return null;
   return (
     <section aria-label={t.label} className="cv-auto container-x pt-14 md:pt-20">
-      <dl className={`grid gap-2 md:gap-4 ${['', 'grid-cols-1', 'grid-cols-2', 'grid-cols-3'][stats.length]}`} data-reveal>
+      <dl className={`grid gap-2 md:gap-4 ${count >= 3 ? 'grid-cols-3' : count === 2 ? 'grid-cols-2' : 'grid-cols-1'}`} data-reveal>
         {stats.map((s) => (
           <div key={s.label} className="card flex flex-col items-center gap-1 px-2 py-5 text-center md:items-start md:px-7 md:py-7 md:text-start">
             <dt className="flex items-center gap-2 text-xs leading-tight font-semibold text-muted md:text-base">
@@ -133,7 +136,48 @@ function Proof({ lang }: { lang: Locale }) {
             </dd>
           </div>
         ))}
+        {achievement && (
+          <div className="card flex flex-col items-center justify-center gap-1 px-3 py-5 text-center md:items-start md:px-7 md:py-7 md:text-start">
+            <dt className="flex items-center gap-2 text-xs leading-tight font-semibold text-muted md:text-base">
+              <Icon name="award" size={20} className="hidden text-accent-text md:block" />
+              {dict(lang).home.achievement.eyebrow}
+            </dt>
+            <dd className="order-first text-lg leading-tight font-black text-balance md:text-2xl">
+              <Numeric text={achievement.short[lang]} />
+            </dd>
+          </div>
+        )}
       </dl>
+    </section>
+  );
+}
+
+/** The first achievement, with its photo: a real result, highlighted. */
+function Achievement({ lang }: { lang: Locale }) {
+  const a = coach.achievements?.[0];
+  if (!a) return null;
+  const t = dict(lang).home.achievement;
+  return (
+    <section className="cv-auto container-x pb-16 md:pb-24" aria-labelledby="achievement-title">
+      <div className="force-dark relative grid overflow-hidden rounded-[2rem] border border-line md:grid-cols-[0.8fr_1.2fr]" data-reveal>
+        <div className="relative aspect-[4/5] md:aspect-auto md:min-h-[26rem]">
+          <Image src={a.photos[0].src} alt={a.photos[0].alt[lang]} fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover object-top" />
+        </div>
+        <div className="relative flex flex-col justify-center gap-4 p-6 md:p-12">
+          <div aria-hidden="true" className="pointer-events-none absolute -end-24 -top-24 size-80 glow-accent" />
+          <p className="eyebrow relative">{t.eyebrow}</p>
+          <h2 id="achievement-title" className="display relative text-[2.2rem] text-balance sm:text-5xl">
+            <Numeric text={a.title[lang]} />
+          </h2>
+          <p className="relative text-lg text-pretty text-muted">
+            <Numeric text={a.text[lang]} />
+          </p>
+          <Link href={`${route(lang, 'about')}#achievements`} className="btn btn-ghost relative w-fit">
+            {t.cta}
+            <Icon name="arrow" size={18} className="rtl:-scale-x-100" />
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }
@@ -369,6 +413,9 @@ export default function HomePage({ lang }: { lang: Locale }) {
           <Featured lang={lang} />
         </Suspense>
       )}
+      <Suspense>
+        <Achievement lang={lang} />
+      </Suspense>
       <Suspense>
         <Services lang={lang} />
       </Suspense>

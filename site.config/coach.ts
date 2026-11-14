@@ -32,6 +32,36 @@ export const coach: CoachConfig = {
   // Egypt (+20), digits only.
   whatsapp: '201147868373',
 
+  // Only counts that are shown on the site: the 11 stories on the results page.
+  stats: { transformations: 11 },
+
+  // From the coach's own post (no athlete name).
+  achievements: [
+    {
+      id: 'shalaby-classic',
+      short: { ar: 'المركز الثالث · شلبي كلاسيك', en: '3rd place · Shalaby Classic' },
+      title: { ar: 'المركز الثالث في بطولة شلبي كلاسيك', en: '3rd place at the Shalaby Classic' },
+      text: {
+        ar: 'لاعب من فريق الكابتن حصل على المركز الثالث في بطولة شلبي كلاسيك لكمال الأجسام، بعد تحضير 6 أسابيع.',
+        en: 'An athlete coached by Mohamed took 3rd place at the Shalaby Classic bodybuilding championship, after a 6-week prep.',
+      },
+      photos: [
+        {
+          src: '/images/achievements/shalaby-classic-1.webp',
+          width: 800,
+          height: 1000,
+          alt: { ar: 'الكابتن محمد ناصر مع لاعبه بالميدالية والشهادة في بطولة شلبي كلاسيك', en: 'Coach Mohamed Nasser with his athlete, medal and certificate, at the Shalaby Classic' },
+        },
+        {
+          src: '/images/achievements/shalaby-classic-2.webp',
+          width: 768,
+          height: 960,
+          alt: { ar: 'لاعب الكابتن يستعرض بعد الفوز بالمركز الثالث', en: 'The coach\'s athlete posing after taking 3rd place' },
+        },
+      ],
+    },
+  ],
+
   images: {
     hero: {
       src: '/images/coach/mohamed-nasser-hero.webp',

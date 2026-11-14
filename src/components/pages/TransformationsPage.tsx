@@ -7,9 +7,13 @@ import TransformationsGallery from '../TransformationsGallery';
 
 export default function TransformationsPage({ lang }: { lang: Locale }) {
   const t = dict(lang).transformations;
-  const goalsOf = (s: (typeof transformations)[number]) => [s.goal, ...(s.tags ?? [])];
-  // Only goals that have at least one story become filters.
-  const chips = booking.goals.filter((g) => transformations.some((s) => goalsOf(s).includes(g.id))).map((g) => ({ id: g.id, label: g.label[lang] }));
+  // Filters: the goals that have stories, then two badges worth filtering by.
+  const goalsOf = (s: (typeof transformations)[number]) => [s.goal, ...(s.tags ?? []), ...(s.badges ?? [])];
+  const FILTER_BADGES = ['posture', 'online'] as const;
+  const chips = [
+    ...booking.goals.map((g) => ({ id: g.id, label: g.label[lang] })),
+    ...FILTER_BADGES.map((b) => ({ id: b, label: t.badges[b] })),
+  ].filter((c) => transformations.some((s) => goalsOf(s).includes(c.id)));
   return (
     <>
       <PageHeader eyebrow={t.eyebrow} title={t.title} intro={t.intro} />

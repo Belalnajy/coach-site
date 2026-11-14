@@ -109,6 +109,10 @@ export const en: Dict = {
       eyebrow: 'How it works',
       title: 'How we start',
     },
+    achievement: {
+      eyebrow: 'Achievement',
+      cta: 'About the coach',
+    },
     tools: {
       eyebrow: 'Free tools',
       title: 'Know your numbers in a minute',
@@ -147,6 +151,9 @@ export const en: Dict = {
     resultsVary: 'Results vary from person to person with consistency and starting point.',
     empty: 'No stories for this goal yet.',
     cta: 'I want a result like this',
+    angles: { front: 'Front', side: 'Side', back: 'Back' },
+    anglesLabel: 'Photo angle',
+    badges: { posture: 'Posture fixed', online: 'Online coaching', injury: 'Injury comeback', student: 'During final exams' },
   },
   programs: {
     eyebrow: 'Programs',
@@ -312,6 +319,7 @@ export const en: Dict = {
     openMap: 'Open the map',
     socialsTitle: 'Follow',
     contactTitle: 'Direct contact',
+    achievementsTitle: 'Achievements',
     sampleCerts: 'The certifications shown are template samples, replaced with the coach’s real ones.',
   },
   book: {

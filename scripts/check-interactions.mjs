@@ -10,6 +10,7 @@
  */
 import puppeteer from 'puppeteer-core';
 import assert from 'node:assert/strict';
+import { coach } from '../site.config/coach.ts';
 
 const base = process.argv[2] || 'http://localhost:4500';
 const browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || '/home/belal/.cache/puppeteer/manual/chrome', args: ['--no-sandbox'] });
@@ -28,8 +29,8 @@ const phone = async (path) => {
 };
 
 for (const [lang, path, name, expectLines] of [
-  ['ar', '/', 'سارة', ['مرحباً كابتن آدم،', '*الاسم:* سارة', '*الباقة:* متابعة أونلاين شهرية (1,200 ج.م شهرياً)', '*اليوم المفضل:* الأحد', '*الهدف:* خسارة الدهون']],
-  ['en', '/en', 'Sarah', ['Hi Adam,', '*Name:* Sarah', '*Program:* Monthly online coaching (1,200 EGP per month)', '*Preferred day:* Sunday', '*Goal:* Fat loss']],
+  ['ar', '/', 'سارة', [`مرحباً ${coach.shortName.ar}،`, '*الاسم:* سارة', '*الباقة:* متابعة أونلاين شهرية (1,200 ج.م شهرياً)', '*اليوم المفضل:* الأحد', '*الهدف:* خسارة الدهون']],
+  ['en', '/en', 'Sarah', [`Hi ${coach.shortName.en},`, '*Name:* Sarah', '*Program:* Monthly online coaching (1,200 EGP per month)', '*Preferred day:* Sunday', '*Goal:* Fat loss']],
 ]) {
   const page = await phone(path);
   await page.click('nav.fixed a[href*="book"]');
@@ -47,7 +48,7 @@ for (const [lang, path, name, expectLines] of [
   await page.click('dialog[open] button[type="submit"]');
   await sleep(200);
   const [url] = await page.evaluate(() => window.__opened);
-  assert.ok(url?.startsWith('https://wa.me/201000000000?text='), `${lang}: opens wa.me (${url})`);
+  assert.ok(url?.startsWith(`https://wa.me/${coach.whatsapp}?text=`), `${lang}: opens wa.me with the coach's number (${url})`);
   const text = new URL(url).searchParams.get('text');
   for (const line of expectLines) assert.ok(text.includes(line), `${lang}: message has "${line}"\n${text}`);
   await page.keyboard.press('Escape');
@@ -142,6 +143,16 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
   const expected = lang === 'ar' ? 20 : 80;
   assert.ok(Math.abs(value - expected) <= 3, `${lang}: drag to 80% of the width → ${expected} (got ${value})`);
   console.log(`✓ ${lang}: before/after slider (keyboard + drag)`);
+  // Stories with several views switch angle and keep the divider where it is.
+  const angles = await page.$$('article [role="group"] button[aria-pressed]');
+  if (angles.length > 1) {
+    await angles[1].click();
+    await sleep(300);
+    const srcs = await page.$eval('article', (el) => [...el.querySelectorAll('img')].map((i) => i.getAttribute('src')).join(' '));
+    assert.match(srcs, /-side-(before|after)/, `${lang}: the second angle shows the side view`);
+    assert.equal(await slider.evaluate((el) => el.getAttribute('aria-valuenow')), String(value), `${lang}: the divider stays put`);
+    console.log(`✓ ${lang}: angle buttons switch views`);
+  }
   await page.close();
 }
 

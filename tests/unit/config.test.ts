@@ -16,12 +16,16 @@ const clone = (): SiteConfig => structuredClone({ ...site }) as SiteConfig;
 const story = (over: Partial<TransformationConfig> = {}): TransformationConfig => ({
   id: 'test-01',
   goal: 'fat-loss',
-  client: { ar: 'عميل', en: 'Client' },
-  duration: { ar: '12 أسبوع', en: '12 weeks' },
+  title: { ar: 'عنوان', en: 'Title' },
   result: { ar: '−9 كجم', en: '−9 kg' },
-  quote: { ar: 'نص', en: 'Text' },
-  before: { src: '/images/transformations/test-01-before.webp', width: 600, height: 750, alt: { ar: 'قبل', en: 'Before' } },
-  after: { src: '/images/transformations/test-01-after.webp', width: 600, height: 750, alt: { ar: 'بعد', en: 'After' } },
+  caption: { ar: 'نص', en: 'Text' },
+  views: [
+    {
+      angle: 'front',
+      before: { src: '/images/transformations/test-01-front-before.webp', width: 600, height: 750, alt: { ar: 'قبل', en: 'Before' } },
+      after: { src: '/images/transformations/test-01-front-after.webp', width: 600, height: 750, alt: { ar: 'بعد', en: 'After' } },
+    },
+  ],
   sample: false,
   ...over,
 });
@@ -41,7 +45,7 @@ const withTemplatePlaceholders = (): SiteConfig => {
     socials: { instagram: 'https://instagram.com/' },
     images: { ...c.coach.images, hero: { ...c.coach.images.hero, src: '/images/coach/hero.webp' } },
   };
-  c.transformations = [story({ sample: true, before: { ...story().before, src: '/images/transformations/sample-01-before.webp' } })];
+  c.transformations = [story({ sample: true, views: [{ ...story().views[0], before: { ...story().views[0].before, src: '/images/transformations/sample-01-before.webp' } }] })];
   c.testimonials = [{ id: 't1', name: { ar: 'مراجعة', en: 'Review' }, context: { ar: 'سياق', en: 'Context' }, quote: { ar: 'نص', en: 'Text' }, rating: 5, sample: true }];
   return c;
 };
@@ -55,6 +59,32 @@ test('the shipped config is valid, and is a real coach (not the template sample)
 
 test('pictures referenced by the config exist, at the size the config says', async () => {
   assert.deepEqual(await checkFiles(site), []);
+});
+
+test('stories: views must pair up, angles must be distinct, badges known', () => {
+  const bad = clone();
+  bad.transformations = [
+    story({ badges: ['famous' as never], views: [{ ...story().views[0], after: { ...story().views[0].after, width: 500 } }, story().views[0]] }),
+    story({ id: 'test-02', views: [] }),
+  ];
+  const errors = validateConfig(bad);
+  const has = (needle: string) => assert.ok(errors.some((e) => e.includes(needle)), `expected an error mentioning ${needle}\n${errors.join('\n')}`);
+  has('transformations[0].badges[0]: must be "posture", "online", "injury" or "student"');
+  has('transformations[0].views[0]: before and after must be the same size');
+  has('transformations[0].views[1].angle: is used twice');
+  has('transformations[1].views: needs at least one before/after pair');
+});
+
+test('the real stories carry only caption facts: no names, every one consented', () => {
+  assert.ok(site.transformations.length >= 1);
+  for (const t of site.transformations) {
+    assert.equal(t.sample, false, t.id);
+    assert.ok(t.views.length >= 1, t.id);
+  }
+  assert.ok(site.transformations.filter((t) => t.featured).length <= 3, 'at most three featured on the home page');
+  const consent = fs.readFileSync('site.config/transformations.ts', 'utf8');
+  assert.match(consent, /Consent: .*agreed.*2026-11-14/s, 'the consent note is recorded');
+  assert.equal(site.coach.stats?.transformations, site.transformations.length, 'the proof number is the count actually shown');
 });
 
 test('optional sections can be empty or missing: a coach can launch with partial content', () => {
@@ -117,7 +147,7 @@ test('a real coach cannot ship the template\'s sample stories, reviews or placeh
   has('site.config/coach.ts → location.gym: still holds the template');
   has('site.config/coach.ts → socials.instagram: still holds the template');
   has('site.config/coach.ts → images.hero.src: still holds the template');
-  has('site.config/transformations.ts → transformations[0].before.src: still holds the template');
+  has('site.config/transformations.ts → transformations[0].views[0].before.src: still holds the template');
 });
 
 test('the site address: Vercel production domain, SITE_URL override, config fallback', () => {

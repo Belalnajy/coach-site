@@ -124,6 +124,12 @@ export const validateConfig = (config: SiteConfig): string[] => {
       text('coach.ts', 'promises.guarantee.text', promises.guarantee.text);
     }
   }
+  coach.achievements?.forEach((ach, i) => {
+    const at = `achievements[${i}]`;
+    for (const key of ['short', 'title', 'text'] as const) text('coach.ts', `${at}.${key}`, ach[key]);
+    if (!ach.photos?.length) fail('coach.ts', `${at}.photos`, 'needs at least one photo');
+    ach.photos?.forEach((ph, j) => picture('coach.ts', `${at}.photos[${j}]`, ph));
+  });
   if (typeof config.features?.blog !== 'boolean') fail('features.ts', 'blog', 'must be true or false', config.features?.blog);
   picture('coach.ts', 'images.hero', coach.images.hero);
   picture('coach.ts', 'images.portrait', coach.images.portrait);
@@ -209,12 +215,23 @@ export const validateConfig = (config: SiteConfig): string[] => {
     t.tags?.forEach((tag, j) => {
       if (!goals.has(tag)) fail('transformations.ts', `${at}.tags[${j}]`, `must be one of the goals in booking.ts: ${[...goals].join(', ')}`, tag);
     });
-    for (const key of ['client', 'duration', 'result', 'quote'] as const) text('transformations.ts', `${at}.${key}`, t[key]);
-    if (t.detail) text('transformations.ts', `${at}.detail`, t.detail);
-    picture('transformations.ts', `${at}.before`, t.before);
-    picture('transformations.ts', `${at}.after`, t.after);
-    if (t.before && t.after && t.before.width * t.after.height !== t.after.width * t.before.height)
-      fail('transformations.ts', at, 'before and after pictures must have the same shape so the slider lines up');
+    t.badges?.forEach((badge, j) => {
+      if (!['posture', 'online', 'injury', 'student'].includes(badge)) fail('transformations.ts', `${at}.badges[${j}]`, 'must be "posture", "online", "injury" or "student"', badge);
+    });
+    for (const key of ['title', 'result', 'caption'] as const) text('transformations.ts', `${at}.${key}`, t[key]);
+    for (const key of ['detail', 'duration'] as const) if (t[key]) text('transformations.ts', `${at}.${key}`, t[key]);
+    if (!Array.isArray(t.views) || t.views.length === 0) fail('transformations.ts', `${at}.views`, 'needs at least one before/after pair');
+    const angles = new Set<string>();
+    t.views?.forEach((v, j) => {
+      const vat = `${at}.views[${j}]`;
+      if (!['front', 'side', 'back'].includes(v.angle)) fail('transformations.ts', `${vat}.angle`, 'must be "front", "side" or "back"', v.angle);
+      if (angles.has(v.angle)) fail('transformations.ts', `${vat}.angle`, 'is used twice in this story', v.angle);
+      angles.add(v.angle);
+      picture('transformations.ts', `${vat}.before`, v.before);
+      picture('transformations.ts', `${vat}.after`, v.after);
+      if (v.before && v.after && (v.before.width !== v.after.width || v.before.height !== v.after.height))
+        fail('transformations.ts', vat, 'before and after must be the same size so the slider lines up');
+    });
     if (typeof t.sample !== 'boolean') fail('transformations.ts', `${at}.sample`, 'must be true (made-up) or false (real, consented)', t.sample);
   });
 
@@ -280,10 +297,12 @@ export const samplePlaceholders = (config: SiteConfig): { file: string; path: st
     ['coach.ts', 'images.hero.src', coach.images.hero.src],
     ['coach.ts', 'images.portrait.src', coach.images.portrait.src],
     ...(coach.images.map ? [['coach.ts', 'images.map.src', coach.images.map.src] as [string, string, string]] : []),
-    ...config.transformations.flatMap((t, i): [string, string, string][] => [
-      ['transformations.ts', `transformations[${i}].before.src`, t.before.src],
-      ['transformations.ts', `transformations[${i}].after.src`, t.after.src],
-    ]),
+    ...config.transformations.flatMap((t, i): [string, string, string][] =>
+      (t.views ?? []).flatMap((v, j): [string, string, string][] => [
+        ['transformations.ts', `transformations[${i}].views[${j}].before.src`, v.before.src],
+        ['transformations.ts', `transformations[${i}].views[${j}].after.src`, v.after.src],
+      ]),
+    ),
   ];
   for (const [file, path, src] of pictures) if (/\/sample-[^/]*$/.test(src) || /^\/images\/coach\/(hero|portrait|map)\.webp$/.test(src)) flag(file, path, src);
   return found;

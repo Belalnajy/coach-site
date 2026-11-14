@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import type { Locale, Picture } from '../../site.config/types';
+import type { Locale, TransformationView } from '../../site.config/types';
 import { fill } from '@/lib/fill';
 
 export interface BeforeAfterLabels {
@@ -12,6 +12,9 @@ export interface BeforeAfterLabels {
   slider: string;
   /** "Before {before}%, after {after}%" */
   sliderValue: string;
+  /** Names of the angles, and of the group of angle buttons. */
+  angles?: Record<TransformationView['angle'], string>;
+  anglesLabel?: string;
 }
 
 /**
@@ -22,10 +25,12 @@ export interface BeforeAfterLabels {
  * While dragging, the position is written straight to a CSS variable (no
  * React render per frame), so it stays smooth on slow phones. A horizontal
  * drag moves the divider; a vertical one still scrolls the page.
+ *
+ * With several views (front, side, back), buttons under the picture switch
+ * between them; the divider stays where it is.
  */
 export default function BeforeAfter({
-  before,
-  after,
+  views,
   lang,
   name,
   sizes,
@@ -33,8 +38,7 @@ export default function BeforeAfter({
   hint = false,
   labels: t,
 }: {
-  before: Picture;
-  after: Picture;
+  views: TransformationView[];
   lang: Locale;
   name: string;
   sizes: string;
@@ -48,6 +52,8 @@ export default function BeforeAfter({
   const pos = useRef(50);
   const gesture = useRef<{ x: number; y: number; id: number; dragging: boolean } | null>(null);
   const [value, setValue] = useState(50);
+  const [current, setCurrent] = useState(0);
+  const { before, after } = views[current] ?? views[0];
   const rtl = lang === 'ar';
 
   const apply = (next: number, commit = true) => {
@@ -131,6 +137,7 @@ export default function BeforeAfter({
   };
 
   return (
+    <div>
     <div
       ref={root}
       className="relative aspect-[4/5] cursor-ew-resize touch-pan-y overflow-hidden rounded-[1.5rem] bg-surface-2 select-none"
@@ -168,6 +175,16 @@ export default function BeforeAfter({
           </svg>
         </div>
       </div>
+    </div>
+    {views.length > 1 && t.angles && (
+      <div role="group" aria-label={t.anglesLabel} className="mt-2 flex gap-1.5">
+        {views.map((v, i) => (
+          <button key={v.angle} type="button" className="chip !min-h-11 flex-1 !px-3 text-sm" aria-pressed={i === current} onClick={() => setCurrent(i)}>
+            {t.angles![v.angle]}
+          </button>
+        ))}
+      </div>
+    )}
     </div>
   );
 }

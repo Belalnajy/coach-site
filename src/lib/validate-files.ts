@@ -16,10 +16,13 @@ export const checkFiles = async (config: SiteConfig, publicDir = path.join(proce
     ['coach.ts', 'images.hero', config.coach.images.hero],
     ['coach.ts', 'images.portrait', config.coach.images.portrait],
     ...(config.coach.images.map ? [['coach.ts', 'images.map', config.coach.images.map] as [string, string, Picture]] : []),
-    ...config.transformations.flatMap((t, i): [string, string, Picture][] => [
-      ['transformations.ts', `transformations[${i}].before`, t.before],
-      ['transformations.ts', `transformations[${i}].after`, t.after],
-    ]),
+    ...config.transformations.flatMap((t, i): [string, string, Picture][] =>
+      t.views.flatMap((v, j): [string, string, Picture][] => [
+        ['transformations.ts', `transformations[${i}].views[${j}].before`, v.before],
+        ['transformations.ts', `transformations[${i}].views[${j}].after`, v.after],
+      ]),
+    ),
+    ...(config.coach.achievements ?? []).flatMap((a, i) => a.photos.map((p, j): [string, string, Picture] => ['coach.ts', `achievements[${i}].photos[${j}]`, p])),
   ];
   for (const [file, at, pic] of pictures) {
     const full = path.join(publicDir, pic.src);

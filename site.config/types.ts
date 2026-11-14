@@ -81,6 +81,18 @@ export interface CoachConfig {
   /** International number for WhatsApp, digits only, e.g. "201001234567". */
   whatsapp: string;
   email?: string;
+  /**
+   * Achievements: a competition result, an award… Shown on the About page,
+   * with the first one highlighted on the home page and in the proof row.
+   */
+  achievements?: {
+    id: string;
+    /** Short form for the proof row, e.g. "3rd place · Shalaby Classic". */
+    short: Localized;
+    title: Localized;
+    text: Localized;
+    photos: Picture[];
+  }[];
   /** Proof numbers on the home and About pages. Each one is shown only if set. */
   stats?: {
     yearsExperience?: number;
@@ -234,23 +246,35 @@ export interface BookingConfig {
   goals: GoalConfig[];
 }
 
+/** One camera angle of a before/after pair. Both pictures the same size (4:5). */
+export interface TransformationView {
+  angle: 'front' | 'side' | 'back';
+  before: Picture;
+  after: Picture;
+}
+
+/** Extra facts about a story, each shown as a small badge and usable as a filter. */
+export type TransformationBadge = 'posture' | 'online' | 'injury' | 'student';
+
 export interface TransformationConfig {
   id: string;
   /** Must be one of booking.goals ids. */
   goal: string;
-  /** Extra filter tags, e.g. "women". Each must be a goal id too. */
+  /** Extra goal tags (each a goal id), for the filters. */
   tags?: string[];
-  /** Display name. With real clients: first name or initials, with consent. */
-  client: Localized;
-  /** How long the change took, e.g. "12 weeks". */
-  duration: Localized;
-  /** The headline result, e.g. "−9 kg" or "−6% body fat". */
+  badges?: TransformationBadge[];
+  /** Short title. Never the client's name unless they asked for it. */
+  title: Localized;
+  /** The headline result, e.g. "−23 kg" or "+15 kg". */
   result: Localized;
-  /** A second figure, optional, e.g. "waist −11 cm". */
+  /** A second figure, e.g. "108 → 85 kg" or "body fat 26% → 11%". */
   detail?: Localized;
-  quote: Localized;
-  before: Picture;
-  after: Picture;
+  /** How long it took, only if known, e.g. "4 months". */
+  duration?: Localized;
+  /** One or two sentences from the coach's own post. No invented quotes. */
+  caption: Localized;
+  /** The first view is the one shown first; with more, the slider lets you switch. */
+  views: TransformationView[];
   /** Show on the home page. */
   featured?: boolean;
   /** true for the template's made-up stories. Shows a "Sample" badge. */

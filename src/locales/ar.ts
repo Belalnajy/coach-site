@@ -112,6 +112,10 @@ export const ar = {
       eyebrow: 'كيف نبدأ',
       title: 'كيف نبدأ',
     },
+    achievement: {
+      eyebrow: 'إنجاز',
+      cta: 'عن الكابتن',
+    },
     tools: {
       eyebrow: 'أدوات مجانية',
       title: 'اعرف أرقامك في دقيقة',
@@ -150,6 +154,9 @@ export const ar = {
     resultsVary: 'النتائج تختلف من شخص لآخر حسب الالتزام ونقطة البداية.',
     empty: 'لا توجد قصص لهذا الهدف بعد.',
     cta: 'أريد نتيجة مثلها',
+    angles: { front: 'أمامي', side: 'جانبي', back: 'خلفي' },
+    anglesLabel: 'زاوية الصورة',
+    badges: { posture: 'تصحيح وضعية الظهر', online: 'متابعة أونلاين', injury: 'عودة بعد إصابة', student: 'أثناء الثانوية العامة' },
   },
   programs: {
     eyebrow: 'الباقات',
@@ -315,6 +322,7 @@ export const ar = {
     openMap: 'افتح الخريطة',
     socialsTitle: 'تابعني',
     contactTitle: 'تواصل مباشر',
+    achievementsTitle: 'الإنجازات',
     sampleCerts: 'الشهادات الظاهرة عيّنات من القالب، وتُستبدل بشهادات المدرب الحقيقية.',
   },
   book: {

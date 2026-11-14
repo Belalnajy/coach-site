@@ -7,6 +7,7 @@ import { whatsappUrl } from '@/lib/whatsapp';
 import BookLink from '../BookLink';
 import EmailText from '../EmailText';
 import Icon from '../Icon';
+import Numeric from '../Numeric';
 import Socials from '../Socials';
 
 /**
@@ -116,6 +117,36 @@ export default function AboutPage({ lang }: { lang: Locale }) {
             </section>
           )}
         </div>
+      )}
+
+      {coach.achievements && coach.achievements.length > 0 && (
+        <section id="achievements" className="container-x scroll-mt-24 py-14 md:py-20" aria-labelledby="achievements-title">
+          <h2 id="achievements-title" className="display mb-8 text-4xl sm:text-5xl">
+            {t.about.achievementsTitle}
+          </h2>
+          <ul className="space-y-6">
+            {coach.achievements.map((a) => (
+              <li key={a.id} className="card grid gap-6 overflow-hidden p-3 md:grid-cols-[1.1fr_0.9fr] md:p-4">
+                <div className={`grid gap-3 ${a.photos.length > 1 ? 'grid-cols-2' : ''}`}>
+                  {a.photos.map((p) => (
+                    <div key={p.src} className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] bg-surface-2">
+                      <Image src={p.src} alt={p.alt[lang]} fill sizes="(min-width: 768px) 28vw, 45vw" className="object-cover object-top" />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-col justify-center gap-3 p-3 md:p-6">
+                  <Icon name="award" size={32} className="text-accent-text" />
+                  <h3 className="text-2xl leading-tight font-black text-balance">
+                    <Numeric text={a.title[lang]} />
+                  </h3>
+                  <p className="text-lg text-pretty text-muted">
+                    <Numeric text={a.text[lang]} />
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {show.principles && (

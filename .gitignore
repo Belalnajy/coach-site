@@ -9,3 +9,7 @@ next-env.d.ts
 .lighthouse/
 .vercel/
 npm-debug.log*
+
+# Client screenshots: they show other people's usernames and a client's name.
+# Kept on the owner's machine only; scripts/client-photos.mjs reads them from here.
+assets-src/clients/
