@@ -3,12 +3,13 @@ import type { Locale } from '@/lib/i18n';
 import { dict } from '@/lib/i18n';
 import { goalLabel } from '@/lib/config';
 import BeforeAfter from './BeforeAfter';
+import BookLink from './BookLink';
 import Icon from './Icon';
 import Numeric from './Numeric';
 import { quote } from '@/lib/format';
 
 /** One client's transformation: the slider and the story in numbers. */
-export default function StoryCard({ story, lang, sizes, priority = false, hint = false, headingLevel = 3 }: { story: TransformationConfig; lang: Locale; sizes: string; priority?: boolean; hint?: boolean; headingLevel?: 2 | 3 }) {
+export default function StoryCard({ story, lang, sizes, priority = false, hint = false, headingLevel = 3, cta = false }: { story: TransformationConfig; lang: Locale; sizes: string; priority?: boolean; hint?: boolean; headingLevel?: 2 | 3; /** Show "I want a result like this", booking with this story's goal. */ cta?: boolean }) {
   const t = dict(lang);
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
   return (
@@ -46,7 +47,13 @@ export default function StoryCard({ story, lang, sizes, priority = false, hint =
             <dd className="mt-0.5 font-black">{goalLabel(story.goal, lang)}</dd>
           </div>
         </dl>
-        <blockquote className="border-s-2 border-accent ps-3 text-pretty text-[0.95rem] leading-relaxed">{quote(story.quote[lang], lang)}</blockquote>
+        <blockquote className="border-s-2 border-accent-text ps-3 text-pretty text-[0.95rem] leading-relaxed">{quote(story.quote[lang], lang)}</blockquote>
+        {cta && (
+          <BookLink lang={lang} preset={{ goal: story.goal }} className="btn btn-ghost mt-auto w-full !min-h-11 text-sm">
+            <Icon name="whatsapp" size={18} />
+            {t.transformations.cta}
+          </BookLink>
+        )}
       </div>
     </article>
   );

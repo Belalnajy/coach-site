@@ -159,6 +159,23 @@ for (const [lang, path, forward] of [['en', '/en/transformations', 'ArrowRight']
   const result = await page.$eval('#result-title + p + p', (el) => el.textContent);
   assert.match(result, /^[\d,]+ kcal \/ a day$/, 'calorie result announced once, with its unit');
   console.log(`✓ calculators: tabs by keyboard, hash, live result (${result.trim()})`);
+
+  // Out-of-range typing is flagged, not silently ignored, and snaps on blur.
+  const fields = await page.$$('input[type="number"]');
+  let weight = null;
+  for (const field of fields) if ((await field.evaluate((el) => document.querySelector(`label[for="${el.id}"]`)?.textContent)) === 'Weight') weight = field;
+  assert.ok(weight, 'the weight field is labelled');
+  await weight.click({ clickCount: 3 });
+  await page.keyboard.type('500');
+  assert.equal(await weight.evaluate((el) => el.getAttribute('aria-invalid')), 'true', 'out of range marks the field invalid');
+  const describedBy = () => weight.evaluate((el) => document.getElementById(el.getAttribute('aria-describedby'))?.textContent ?? '');
+  assert.match(await describedBy(), /Enter 35–250 kg/);
+  await page.keyboard.press('Tab');
+  await sleep(150);
+  assert.equal(await weight.evaluate((el) => el.value), '250', 'snaps to the maximum on blur');
+  assert.equal(await weight.evaluate((el) => el.hasAttribute('aria-invalid')), false);
+  assert.match(await describedBy(), /Set to 250 kg/);
+  console.log('✓ calculators: out-of-range input flagged, then clamped with a note');
   await page.close();
 }
 

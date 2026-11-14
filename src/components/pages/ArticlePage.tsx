@@ -97,7 +97,11 @@ export default function ArticlePage({ lang, post }: { lang: Locale; post: Post }
       <div className="container-x max-w-3xl py-10">
         <div className="prose-coach">{post.body[lang].map(block)}</div>
         <div className="mt-10 border-t border-line pt-6">
-          <ShareLinks lang={lang} url={url} title={post.title[lang]} />
+          <ShareLinks
+            url={url}
+            title={post.title[lang]}
+            labels={{ share: t.blog.share, shareOn: t.blog.shareOn, copyLink: t.blog.copyLink, copied: t.blog.copied, newTab: t.common.newTab, whatsapp: t.common.whatsapp, x: t.common.x, facebook: t.common.facebook }}
+          />
         </div>
         <aside className="mt-10 flex flex-col gap-4 rounded-[1.75rem] bg-accent p-6 text-on-accent sm:flex-row sm:items-center sm:justify-between">
           <div>

@@ -36,7 +36,6 @@ export const LIMITS = {
   hipCm: [50, 200],
 } as const;
 
-const clamp = (n: number, [lo, hi]: readonly [number, number]) => Math.min(hi, Math.max(lo, n));
 const round = (n: number, step = 1) => Math.round(n / step) * step;
 
 /** Mifflin–St Jeor resting energy expenditure, kcal/day. */
@@ -61,15 +60,28 @@ export interface CalorieResult {
   macros: { proteinG: number; fatG: number; carbsG: number };
 }
 
+/**
+ * The weight protein is based on. Protein needs follow lean mass, not fat,
+ * so above a BMI of 25 the weight at a BMI of 25 for the person's height is
+ * used instead (otherwise someone at 150 kg would be told to eat 300 g).
+ */
+export const proteinReferenceKg = (weightKg: number, heightCm?: number): number =>
+  heightCm ? Math.min(weightKg, 25 * (heightCm / 100) ** 2) : weightKg;
+
+/** Protein never takes more than this share of the calorie target, so carbohydrate always has room. */
+export const PROTEIN_MAX_SHARE = 0.35;
+
 export const calories = (input: CalorieInput): CalorieResult => {
   const bmr = bmrMifflin(input);
   const tdee = bmr * ACTIVITY_FACTORS[input.activity];
   const raw = tdee * GOAL_FACTORS[input.goal];
   const floor = CALORIE_FLOOR[input.sex];
   const target = Math.max(raw, floor);
-  // Macros: protein from the protein guide, a quarter of energy from fat,
-  // carbohydrate fills the rest (never below zero).
-  const proteinG = round(input.weightKg * (input.goal === 'lose' ? 2.0 : input.goal === 'gain' ? 1.8 : 1.6));
+  // Macros: protein from the protein guide (on the reference weight, capped
+  // at 35% of energy), a quarter of energy from fat, carbohydrate the rest:
+  // at least 40% of the target.
+  const perKg = input.goal === 'lose' ? 2.0 : input.goal === 'gain' ? 1.8 : 1.6;
+  const proteinG = round(Math.min(proteinReferenceKg(input.weightKg, input.heightCm) * perKg, (target * PROTEIN_MAX_SHARE) / 4));
   const fatG = round((target * 0.25) / 9);
   const carbsG = Math.max(0, round((target - proteinG * 4 - fatG * 9) / 4));
   return {
@@ -97,14 +109,19 @@ export interface ProteinResult {
   /** The middle of the range, rounded to 5 g. */
   targetG: number;
   perMealG: number;
+  /** The weight the range is based on (see proteinReferenceKg). */
+  referenceKg: number;
+  /** true when that is less than the body weight (BMI above 25). */
+  adjusted: boolean;
 }
 
-export const protein = ({ weightKg, goal, meals }: { weightKg: number; goal: ProteinGoal; meals: number }): ProteinResult => {
+export const protein = ({ weightKg, heightCm, goal, meals }: { weightKg: number; heightCm?: number; goal: ProteinGoal; meals: number }): ProteinResult => {
   const [lo, hi] = PROTEIN_RANGES[goal];
-  const minG = round(weightKg * lo);
-  const maxG = round(weightKg * hi);
+  const referenceKg = proteinReferenceKg(weightKg, heightCm);
+  const minG = round(referenceKg * lo);
+  const maxG = round(referenceKg * hi);
   const targetG = round((minG + maxG) / 2, 5);
-  return { minG, maxG, targetG, perMealG: round(targetG / Math.max(1, meals)) };
+  return { minG, maxG, targetG, perMealG: round(targetG / Math.max(1, meals)), referenceKg: Math.round(referenceKg * 10) / 10, adjusted: referenceKg < weightKg };
 };
 
 export type BmiCategory = 'under' | 'healthy' | 'over' | 'obese';
@@ -136,12 +153,14 @@ export interface IdealWeightResult {
 const inchesOver5ft = (heightCm: number) => Math.max(0, heightCm / 2.54 - 60);
 
 export const idealWeight = ({ sex, heightCm, weightKg }: { sex: Sex; heightCm: number; weightKg: number }): IdealWeightResult => {
-  const value = bmi(weightKg, heightCm);
+  // The category follows the value as shown (one decimal), so 24.96 shows
+  // "25.0 · Overweight", never "25.0 · Healthy".
+  const shown = Math.round(bmi(weightKg, heightCm) * 10) / 10;
   const m2 = (heightCm / 100) ** 2;
   const inches = inchesOver5ft(heightCm);
   return {
-    bmi: Math.round(value * 10) / 10,
-    category: bmiCategory(value),
+    bmi: shown,
+    category: bmiCategory(shown),
     healthyMinKg: Math.round(18.5 * m2 * 10) / 10,
     healthyMaxKg: Math.round(24.9 * m2 * 10) / 10,
     devineKg: Math.round(((sex === 'male' ? 50 : 45.5) + 2.3 * inches) * 10) / 10,
@@ -206,7 +225,3 @@ export const bodyFatNavy = (input: BodyFatInput): BodyFatResult => {
   const fatMassKg = weightKg ? Math.round(((weightKg * percent) / 100) * 10) / 10 : null;
   return { percent, category, fatMassKg, leanMassKg: weightKg && fatMassKg !== null ? Math.round((weightKg - fatMassKg) * 10) / 10 : null };
 };
-
-/** Brings a typed-in value back into the range the formulas are valid for. */
-export const sanitize = (value: number, key: keyof typeof LIMITS): number =>
-  Number.isFinite(value) ? clamp(value, LIMITS[key]) : LIMITS[key][0];

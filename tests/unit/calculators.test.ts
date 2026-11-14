@@ -8,7 +8,7 @@ import {
   calories,
   idealWeight,
   protein,
-  sanitize,
+  proteinReferenceKg,
 } from '../../src/lib/calculators.ts';
 
 const close = (actual: number, expected: number, tolerance = 0.05) =>
@@ -48,9 +48,10 @@ test('calorie macros add up to the target', () => {
 });
 
 test('protein range by goal', () => {
-  assert.deepEqual(protein({ weightKg: 80, goal: 'lose', meals: 4 }), { minG: 144, maxG: 176, targetG: 160, perMealG: 40 });
-  assert.deepEqual(protein({ weightKg: 70, goal: 'health', meals: 3 }), { minG: 56, maxG: 70, targetG: 65, perMealG: 22 });
-  assert.deepEqual(protein({ weightKg: 90, goal: 'gain', meals: 5 }), { minG: 144, maxG: 198, targetG: 170, perMealG: 34 });
+  const pick = ({ minG, maxG, targetG, perMealG }: ReturnType<typeof protein>) => ({ minG, maxG, targetG, perMealG });
+  assert.deepEqual(pick(protein({ weightKg: 80, goal: 'lose', meals: 4 })), { minG: 144, maxG: 176, targetG: 160, perMealG: 40 });
+  assert.deepEqual(pick(protein({ weightKg: 70, goal: 'health', meals: 3 })), { minG: 56, maxG: 70, targetG: 65, perMealG: 22 });
+  assert.deepEqual(pick(protein({ weightKg: 90, goal: 'gain', meals: 5 })), { minG: 144, maxG: 198, targetG: 170, perMealG: 34 });
 });
 
 test('BMI and WHO categories', () => {
@@ -93,9 +94,39 @@ test('body fat refuses impossible measurements', () => {
   assert.equal(bodyFatNavy({ sex: 'female', heightCm: 165, neckCm: 32, waistCm: 70 }).percent, null);
 });
 
-test('sanitize clamps typed values into the valid range', () => {
-  assert.equal(sanitize(5, 'age'), 15);
-  assert.equal(sanitize(400, 'weightKg'), 250);
-  assert.equal(sanitize(Number.NaN, 'heightCm'), 120);
-  assert.equal(sanitize(172, 'heightCm'), 172);
+test('protein above BMI 25 is based on the weight at BMI 25', () => {
+  // 180 cm: BMI 25 is 81 kg.
+  assert.equal(proteinReferenceKg(150, 180), 81);
+  assert.equal(proteinReferenceKg(70, 180), 70);
+  const p150 = protein({ weightKg: 150, heightCm: 180, goal: 'lose', meals: 4 });
+  assert.deepEqual(
+    { min: p150.minG, max: p150.maxG, target: p150.targetG, ref: p150.referenceKg, adjusted: p150.adjusted },
+    { min: 146, max: 178, target: 160, ref: 81, adjusted: true },
+  );
+  const p250 = protein({ weightKg: 250, heightCm: 180, goal: 'lose', meals: 4 });
+  assert.equal(p250.targetG, 160, '250 kg gets the same protein as anyone 81 kg and up at 180 cm');
+  assert.equal(protein({ weightKg: 70, heightCm: 180, goal: 'lose', meals: 4 }).adjusted, false);
+});
+
+test('calorie macros: protein on the reference weight, carbohydrate never squeezed out', () => {
+  for (const input of [
+    { sex: 'male', age: 30, heightCm: 180, weightKg: 150, activity: 'moderate', goal: 'lose' },
+    { sex: 'male', age: 30, heightCm: 180, weightKg: 250, activity: 'sedentary', goal: 'lose' },
+    { sex: 'female', age: 70, heightCm: 150, weightKg: 45, activity: 'sedentary', goal: 'lose' },
+    { sex: 'female', age: 40, heightCm: 155, weightKg: 140, activity: 'sedentary', goal: 'lose' },
+  ] as const) {
+    const r = calories({ ...input });
+    assert.ok(r.macros.proteinG * 4 <= r.target * 0.35 + 4, `${input.weightKg} kg: protein at most 35% of energy`);
+    assert.ok(r.macros.carbsG * 4 >= r.target * 0.39, `${input.weightKg} kg: carbs keep at least ~40% (${r.macros.carbsG} g of ${r.target} kcal)`);
+  }
+  // 150 kg at 180 cm, cutting: 2.0 g × 81 kg = 162 g.
+  assert.equal(calories({ sex: 'male', age: 30, heightCm: 180, weightKg: 150, activity: 'moderate', goal: 'lose' }).macros.proteinG, 162);
+  assert.equal(calories({ sex: 'male', age: 30, heightCm: 180, weightKg: 250, activity: 'sedentary', goal: 'lose' }).macros.proteinG, 162);
+});
+
+test('BMI category follows the rounded value shown', () => {
+  // 80.85 kg at 180 cm is BMI 24.954…, shown as 25.0.
+  const r = idealWeight({ sex: 'male', heightCm: 180, weightKg: 80.85 });
+  assert.equal(r.bmi, 25);
+  assert.equal(r.category, 'over');
 });

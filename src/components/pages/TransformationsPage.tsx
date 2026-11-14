@@ -1,13 +1,15 @@
 import type { Locale } from '@/lib/i18n';
 import { dict } from '@/lib/i18n';
-import { coach } from '@/lib/config';
-import BookLink from '../BookLink';
-import Icon from '../Icon';
+import { booking, coach, transformations } from '@/lib/config';
 import PageHeader from '../PageHeader';
+import StoryCard from '../StoryCard';
 import TransformationsGallery from '../TransformationsGallery';
 
 export default function TransformationsPage({ lang }: { lang: Locale }) {
   const t = dict(lang).transformations;
+  const goalsOf = (s: (typeof transformations)[number]) => [s.goal, ...(s.tags ?? [])];
+  // Only goals that have at least one story become filters.
+  const chips = booking.goals.filter((g) => transformations.some((s) => goalsOf(s).includes(g.id))).map((g) => ({ id: g.id, label: g.label[lang] }));
   return (
     <>
       <PageHeader eyebrow={t.eyebrow} title={t.title} intro={t.intro} />
@@ -19,15 +21,18 @@ export default function TransformationsPage({ lang }: { lang: Locale }) {
           </p>
         )}
         <div className="mt-4">
-          <TransformationsGallery lang={lang} />
+          <TransformationsGallery
+            lang={lang}
+            chips={chips}
+            labels={{ all: t.all, filterLabel: t.filterLabel, count: t.count, empty: t.empty, cta: t.cta }}
+            stories={transformations.map((s, i) => ({
+              id: s.id,
+              goals: goalsOf(s),
+              card: <StoryCard story={s} lang={lang} sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" priority={i === 0} hint={i === 0} headingLevel={2} cta />,
+            }))}
+          />
         </div>
-        <div className="mt-12 flex flex-col items-center gap-4 text-center">
-          <p className="text-sm text-muted">{t.resultsVary}</p>
-          <BookLink lang={lang} className="btn btn-primary btn-lg w-full sm:w-auto">
-            <Icon name="whatsapp" size={22} />
-            {t.cta}
-          </BookLink>
-        </div>
+        <p className="mt-6 text-center text-sm text-muted">{t.resultsVary}</p>
       </div>
     </>
   );

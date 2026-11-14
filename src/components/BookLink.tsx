@@ -1,7 +1,7 @@
 'use client';
 
 import type { MouseEvent, ReactNode } from 'react';
-import type { Locale } from '@/lib/i18n';
+import type { Locale } from '../../site.config/types';
 import { route } from '@/lib/routes';
 import { useBooking, type BookingPreset } from './BookingProvider';
 

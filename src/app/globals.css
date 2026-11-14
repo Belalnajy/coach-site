@@ -674,3 +674,19 @@ dialog.sheet:not([open])::backdrop {
 .range:focus-visible::-webkit-slider-thumb {
   box-shadow: 0 0 0 2px var(--accent), 0 0 0 6px color-mix(in srgb, var(--accent-text) 45%, transparent);
 }
+
+/* Calculator options: a check mark in the corner of the chosen one. */
+.seg {
+  position: relative;
+}
+input:checked + .seg::after {
+  content: '';
+  position: absolute;
+  top: 0.45rem;
+  inset-inline-end: 0.5rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
