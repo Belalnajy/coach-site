@@ -38,11 +38,17 @@ export interface Certification {
 export interface CoachConfig {
   /**
    * true while the site still shows the template's made-up sample content.
-   * It puts a small "sample content" notice in the footer. Set it to false
-   * only after every sample (results, reviews, photos) has been replaced.
+   * It puts a small "sample content" notice in the footer and keeps the site
+   * out of search engines. Set it to false for a real coach: the build then
+   * refuses any of the template's placeholder values that are left.
    */
   sample: boolean;
-  /** Public address of the site, no trailing slash. Used for SEO links. */
+  /**
+   * Public address of the site, no trailing slash, used for SEO links. On
+   * Vercel it is worked out at build time from the project's production
+   * domain (or SITE_URL if set), so this is only the fallback, e.g. for a
+   * local build.
+   */
   siteUrl: string;
   /** Full name, e.g. "Coach Adam" / "الكابتن آدم". */
   name: Localized;
@@ -60,38 +66,62 @@ export interface CoachConfig {
   headline: Localized;
   /** One or two sentences under the headline. */
   intro: Localized;
-  /** About page story. */
-  story: LocalizedParagraphs;
+
+  // ------------------------------------------------------------------------
+  // Everything below is optional. A section whose content is missing or empty
+  // is simply not shown (and its menu entry and structured data go with it),
+  // so a coach can launch with what they have and add the rest later. Never
+  // fill these with guesses about a real person.
+  // ------------------------------------------------------------------------
+
+  /** About page story, a few paragraphs. */
+  story?: LocalizedParagraphs;
   /** Short philosophy points shown on the About page. */
-  principles: { title: Localized; text: Localized }[];
+  principles?: { title: Localized; text: Localized }[];
   /** International number for WhatsApp, digits only, e.g. "201001234567". */
   whatsapp: string;
   email?: string;
-  stats: {
-    yearsExperience: number;
-    clients: number;
-    transformations: number;
+  /** Proof numbers on the home and About pages. Each one is shown only if set. */
+  stats?: {
+    yearsExperience?: number;
+    clients?: number;
+    transformations?: number;
   };
-  certifications: Certification[];
-  location: {
+  certifications?: Certification[];
+  /** The gym. Leave it out for online-only coaches or until it is confirmed. */
+  location?: {
     gym: Localized;
-    address: Localized;
-    city: Localized;
+    address?: Localized;
+    city?: Localized;
     /** ISO country code, e.g. "EG", "SA", "AE". */
-    country: string;
+    country?: string;
     /** Any Google Maps (or other) link to the gym. */
-    mapUrl: string;
+    mapUrl?: string;
     geo?: { lat: number; lng: number };
     /** Human-readable opening hours. */
-    hours: Localized;
+    hours?: Localized;
     /** Machine-readable hours for search engines, schema.org format. */
-    openingHours: string[];
+    openingHours?: string[];
   };
-  socials: Partial<Record<'instagram' | 'tiktok' | 'youtube' | 'facebook' | 'x', string>>;
+  socials?: Partial<Record<'instagram' | 'tiktok' | 'youtube' | 'facebook' | 'x', string>>;
+  /**
+   * Promises about the service, each shown only when the coach has confirmed it:
+   * - replyTime: the hero's "replies within hours" note;
+   * - steps: "How it works" on the home page;
+   * - afterBooking: "What happens next?" on the booking page;
+   * - guarantee: the refund/guarantee card on the programs page.
+   */
+  promises?: {
+    replyTime?: Localized;
+    steps?: { title: Localized; text: Localized }[];
+    afterBooking?: Localized[];
+    guarantee?: { title: Localized; text: Localized };
+  };
   images: {
     hero: Picture;
     portrait: Picture;
-    map: Picture;
+    /** A map or gym picture for the location card. */
+    map?: Picture;
   };
   currency: {
     /** ISO 4217 code, e.g. "EGP", "SAR", "AED", "USD". */
@@ -101,6 +131,16 @@ export interface CoachConfig {
   };
   /** Digits used for Arabic text: "latn" (123) or "arab" (١٢٣). */
   arabicDigits: 'latn' | 'arab';
+}
+
+/** Whole parts of the site that can be switched off. */
+export interface FeaturesConfig {
+  /**
+   * The blog (articles in site.config/posts). Off: no blog pages, menu entry
+   * or sitemap entries. Articles read as written by the coach, so keep it off
+   * until the coach has approved them.
+   */
+  blog: boolean;
 }
 
 export type ColorMode = 'dark' | 'light';

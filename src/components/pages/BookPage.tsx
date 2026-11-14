@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import type { Locale } from '@/lib/i18n';
 import { dict } from '@/lib/i18n';
-import { coach } from '@/lib/config';
+import { coach, show } from '@/lib/config';
 import { whatsappUrl } from '@/lib/whatsapp';
 import { bookingData } from '@/lib/booking-data';
 import BookingForm from '../BookingForm';
@@ -20,20 +20,22 @@ export default function BookPage({ lang }: { lang: Locale }) {
         <Suspense fallback={<BookingForm data={data} variant="page" />}>
           <BookingPageForm data={data} />
         </Suspense>
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
+        <div className={`mt-14 grid gap-5 ${show.afterBooking ? 'md:grid-cols-2' : ''}`}>
+          {show.afterBooking && (
           <section className="card p-6 md:p-8" aria-labelledby="next-title">
             <h2 id="next-title" className="text-xl font-black">
               {t.book.stepsTitle}
             </h2>
             <ol className="mt-4 space-y-3">
-              {t.book.steps.map((s, i) => (
-                <li key={s} className="flex items-start gap-3">
+              {coach.promises!.afterBooking!.map((s, i) => (
+                <li key={s.en} className="flex items-start gap-3">
                   <span className="num grid size-8 shrink-0 place-items-center rounded-full bg-accent text-on-accent">{i + 1}</span>
-                  <span className="pt-1">{s}</span>
+                  <span className="pt-1">{s[lang]}</span>
                 </li>
               ))}
             </ol>
           </section>
+          )}
           <section className="card p-6 md:p-8" aria-labelledby="direct-title">
             <h2 id="direct-title" className="text-xl font-black">
               {t.book.otherWays}
@@ -54,10 +56,12 @@ export default function BookPage({ lang }: { lang: Locale }) {
                   </a>
                 </li>
               )}
-              <li className="flex items-start gap-2 pt-1 text-muted">
-                <Icon name="clock" size={20} className="mt-0.5 shrink-0" />
-                {coach.location.hours[lang]}
-              </li>
+              {coach.location?.hours && (
+                <li className="flex items-start gap-2 pt-1 text-muted">
+                  <Icon name="clock" size={20} className="mt-0.5 shrink-0" />
+                  {coach.location.hours[lang]}
+                </li>
+              )}
             </ul>
           </section>
         </div>

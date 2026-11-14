@@ -7,7 +7,7 @@ import { whatsappUrl } from '@/lib/whatsapp';
 import EmailText from './EmailText';
 import Icon from './Icon';
 import Logo from './Logo';
-import { NAV } from './nav';
+import { NAV } from '@/lib/nav';
 import Socials from './Socials';
 
 export default function Footer({ lang }: { lang: Locale }) {
@@ -55,12 +55,12 @@ export default function Footer({ lang }: { lang: Locale }) {
                 </a>
               </li>
             )}
-            <li className="flex items-start gap-2 pt-2 text-muted">
-              <Icon name="pin" size={18} className="mt-1 shrink-0" />
-              <span>
-                {[coach.location.gym[lang], coach.location.address[lang], coach.location.city[lang]].join(lang === 'ar' ? '، ' : ', ')}
-              </span>
-            </li>
+            {coach.location && (
+              <li className="flex items-start gap-2 pt-2 text-muted">
+                <Icon name="pin" size={18} className="mt-1 shrink-0" />
+                <span>{[coach.location.gym[lang], coach.location.address?.[lang], coach.location.city?.[lang]].filter(Boolean).join(lang === 'ar' ? '، ' : ', ')}</span>
+              </li>
+            )}
           </ul>
         </div>
       </div>

@@ -86,7 +86,6 @@ export const en: Dict = {
     eyebrow: '{role}',
     primaryCta: 'Book now',
     secondaryCta: 'Work out your calories',
-    heroNote: 'WhatsApp replies within hours',
     marquee: ['Strength', 'Fat loss', 'Muscle', 'Nutrition', 'Fitness', 'Consistency'],
     proof: {
       label: 'In numbers',
@@ -108,18 +107,12 @@ export const en: Dict = {
     },
     steps: {
       eyebrow: 'How it works',
-      title: 'Four steps to start',
-      items: [
-        { title: 'Book on WhatsApp', text: 'Pick a package and a time on the site; the message writes itself.' },
-        { title: 'Intro call', text: 'Fifteen minutes on your goal, your schedule and any old injuries.' },
-        { title: 'Your plan in 48 hours', text: 'A training and nutrition plan written for you, in an easy app.' },
-        { title: 'Weekly check-ins', text: 'We measure and adjust until you reach the goal and know how to keep it.' },
-      ],
+      title: 'How we start',
     },
     tools: {
       eyebrow: 'Free tools',
       title: 'Know your numbers in a minute',
-      text: 'Four calculators using the same formulas I use with my clients.',
+      text: 'Four calculators built on well-known formulas, with instant results.',
       cta: 'Open the calculators',
     },
     testimonials: {
@@ -132,7 +125,7 @@ export const en: Dict = {
     },
     final: {
       title: 'The first step is easier than you think',
-      text: 'One WhatsApp message, and we set up your intro call.',
+      text: 'One WhatsApp message, and we start.',
       button: 'Book now',
     },
   },
@@ -158,17 +151,16 @@ export const en: Dict = {
   programs: {
     eyebrow: 'Programs',
     title: 'Programs and prices',
-    intro: 'Every program starts with a free intro call. Pick one, book on WhatsApp, and we agree the details.',
+    intro: 'Pick a program, book on WhatsApp, and we agree the details.',
     online: 'Online coaching',
     onlineText: 'From anywhere, in a gym or at home.',
     inPerson: 'Training in the gym',
     inPersonText: 'One-to-one or small-group sessions at {gym}.',
+    inPersonTextNoGym: 'One-to-one or small-group sessions in the gym.',
     bookThis: 'Book this program',
     askPrice: 'Ask for the price',
     included: 'Includes',
     pricesIn: 'Prices in {currency}.',
-    guaranteeTitle: 'No risk',
-    guaranteeText: 'If you have not started the program within 7 days of paying, you get a full refund.',
     notSure: 'Torn between two?',
     notSureText: 'Send me your goal and schedule, and I will honestly tell you which fits.',
     notSureCta: 'Ask me on WhatsApp',
@@ -346,7 +338,6 @@ export const en: Dict = {
     opened: 'WhatsApp opened in a new tab. Didn’t open?',
     openAgain: 'Open it here',
     stepsTitle: 'What happens next?',
-    steps: ['You get a reply the same working day.', 'We set up a free 15-minute intro call.', 'Your plan starts within 48 hours of agreeing.'],
     otherWays: 'Or get in touch directly',
   },
   message: {

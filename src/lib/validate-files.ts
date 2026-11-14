@@ -15,7 +15,7 @@ export const checkFiles = async (config: SiteConfig, publicDir = path.join(proce
   const pictures: [string, string, Picture][] = [
     ['coach.ts', 'images.hero', config.coach.images.hero],
     ['coach.ts', 'images.portrait', config.coach.images.portrait],
-    ['coach.ts', 'images.map', config.coach.images.map],
+    ...(config.coach.images.map ? [['coach.ts', 'images.map', config.coach.images.map] as [string, string, Picture]] : []),
     ...config.transformations.flatMap((t, i): [string, string, Picture][] => [
       ['transformations.ts', `transformations[${i}].before`, t.before],
       ['transformations.ts', `transformations[${i}].after`, t.after],

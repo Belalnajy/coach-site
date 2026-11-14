@@ -6,6 +6,7 @@ import Footer from './Footer';
 import Header from './Header';
 import MobileTabBar from './MobileTabBar';
 import { route } from '@/lib/routes';
+import { TAB_KEYS, iconOf } from '@/lib/nav';
 import { bookingData } from '@/lib/booking-data';
 import RevealObserver from './RevealObserver';
 
@@ -26,11 +27,9 @@ export default function SiteShell({ lang, children }: { lang: Locale; children: 
         lang={lang}
         label={t.nav.mobile}
         items={[
-          { href: route(lang, 'home'), label: t.nav.home, icon: 'home' },
-          { href: route(lang, 'transformations'), label: t.nav.transformations, icon: 'results' },
-          { href: route(lang, 'book'), label: t.nav.book, icon: 'whatsapp', book: true },
-          { href: route(lang, 'programs'), label: t.nav.programs, icon: 'dumbbell' },
-          { href: route(lang, 'calculators'), label: t.nav.calculators, icon: 'calculator' },
+          ...TAB_KEYS.slice(0, 2).map((key) => ({ href: route(lang, key), label: t.nav[key], icon: iconOf(key) })),
+          { href: route(lang, 'book'), label: t.nav.book, icon: 'whatsapp' as const, book: true },
+          ...TAB_KEYS.slice(2).map((key) => ({ href: route(lang, key), label: t.nav[key], icon: iconOf(key) })),
         ]}
       />
       <RevealObserver />

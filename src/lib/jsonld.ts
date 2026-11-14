@@ -16,7 +16,7 @@ const ids = {
   website: `${coach.siteUrl}/#website`,
 };
 
-const sameAs = Object.values(coach.socials).filter(Boolean);
+const sameAs = Object.values(coach.socials ?? {}).filter(Boolean);
 
 /**
  * While the site shows sample content (coach.sample), only the WebSite entry
@@ -34,52 +34,56 @@ export const siteJsonLd = (lang: Locale, sample = coach.sample) => {
     ...(sample ? {} : { publisher: { '@id': ids.person } }),
   };
   if (sample) return [website];
+  // Only fields the config actually has: nothing is filled in with guesses.
+  const loc = coach.location;
+  const person = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': ids.person,
+    name: coach.name[lang],
+    alternateName: coach.name[lang === 'ar' ? 'en' : 'ar'],
+    jobTitle: coach.role[lang],
+    description: coach.intro[lang],
+    url: absolute(lang, '/'),
+    image: `${coach.siteUrl}${coach.images.portrait.src}`,
+    telephone: `+${coach.whatsapp}`,
+    ...(coach.email ? { email: coach.email } : {}),
+    knowsLanguage: ['ar', 'en'],
+    ...(loc ? { worksFor: { '@id': ids.business } } : {}),
+    ...(coach.certifications?.length
+      ? {
+          hasCredential: coach.certifications.map((c) => ({
+            '@type': 'EducationalOccupationalCredential',
+            name: c.name[lang],
+            recognizedBy: { '@type': 'Organization', name: c.issuer[lang] },
+          })),
+        }
+      : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+  };
+  if (!loc) return [person, website];
+  const address = {
+    ...(loc.address ? { streetAddress: loc.address[lang] } : {}),
+    ...(loc.city ? { addressLocality: loc.city[lang] } : {}),
+    ...(loc.country ? { addressCountry: loc.country } : {}),
+  };
   const priced = packages.filter((p) => p.price !== 'on-request').map((p) => p.price as number);
-  return [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Person',
-      '@id': ids.person,
-      name: coach.name[lang],
-      alternateName: coach.name[lang === 'ar' ? 'en' : 'ar'],
-      jobTitle: coach.role[lang],
-      description: coach.intro[lang],
-      url: absolute(lang, '/'),
-      image: `${coach.siteUrl}${coach.images.portrait.src}`,
-      worksFor: { '@id': ids.business },
-      knowsLanguage: ['ar', 'en'],
-      hasCredential: coach.certifications.map((c) => ({
-        '@type': 'EducationalOccupationalCredential',
-        name: c.name[lang],
-        recognizedBy: { '@type': 'Organization', name: c.issuer[lang] },
-      })),
-      ...(sameAs.length ? { sameAs } : {}),
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'SportsActivityLocation',
-      '@id': ids.business,
-      name: `${coach.name[lang]} · ${coach.location.gym[lang]}`,
-      description: coach.intro[lang],
-      url: absolute(lang, '/'),
-      image: `${coach.siteUrl}${coach.images.hero.src}`,
-      telephone: `+${coach.whatsapp}`,
-      ...(coach.email ? { email: coach.email } : {}),
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: coach.location.address[lang],
-        addressLocality: coach.location.city[lang],
-        addressCountry: coach.location.country,
-      },
-      ...(coach.location.geo ? { geo: { '@type': 'GeoCoordinates', latitude: coach.location.geo.lat, longitude: coach.location.geo.lng } } : {}),
-      hasMap: coach.location.mapUrl,
-      openingHours: coach.location.openingHours,
-      ...(priced.length ? { priceRange: `${Math.min(...priced)}–${Math.max(...priced)} ${coach.currency.code}` } : {}),
-      founder: { '@id': ids.person },
-      ...(sameAs.length ? { sameAs } : {}),
-    },
-    website,
-  ];
+  const business = {
+    '@context': 'https://schema.org',
+    '@type': 'SportsActivityLocation',
+    '@id': ids.business,
+    name: loc.gym[lang],
+    url: absolute(lang, '/'),
+    image: `${coach.siteUrl}${coach.images.hero.src}`,
+    telephone: `+${coach.whatsapp}`,
+    ...(Object.keys(address).length ? { address: { '@type': 'PostalAddress', ...address } } : {}),
+    ...(loc.geo ? { geo: { '@type': 'GeoCoordinates', latitude: loc.geo.lat, longitude: loc.geo.lng } } : {}),
+    ...(loc.mapUrl ? { hasMap: loc.mapUrl } : {}),
+    ...(loc.openingHours?.length ? { openingHours: loc.openingHours } : {}),
+    ...(priced.length ? { priceRange: `${Math.min(...priced)}–${Math.max(...priced)} ${coach.currency.code}` } : {}),
+    founder: { '@id': ids.person },
+  };
+  return [person, business, website];
 };
 
 /** Nothing when the FAQ is empty (an empty FAQPage is invalid structured data). */
@@ -101,8 +105,8 @@ export const offersJsonLd = (lang: Locale, sample = coach.sample) => sample ? nu
   '@context': 'https://schema.org',
   '@type': 'Service',
   name: coach.role[lang],
-  provider: { '@id': ids.business },
-  areaServed: coach.location.country,
+  provider: { '@id': coach.location ? ids.business : ids.person },
+  ...(coach.location?.country ? { areaServed: coach.location.country } : {}),
   url: absolute(lang, '/programs'),
   hasOfferCatalog: {
     '@type': 'OfferCatalog',

@@ -8,7 +8,7 @@
  *   npm run smoke -- --no-build   (check an existing build)
  */
 import { spawn, execSync } from 'node:child_process';
-import { ROUTE_PATHS } from './routes.mjs';
+import { HIDDEN_PATHS, ROUTE_PATHS } from './routes.mjs';
 import { coach } from '../site.config/coach.ts';
 
 const PORT = Number(process.env.SMOKE_PORT || 4501);
@@ -59,10 +59,13 @@ try {
       // The template's sample coach: hidden from search, no fake business data.
       if (coach.sample && process.env.INDEX_SAMPLE !== 'true' && !html.includes('<meta name="robots" content="noindex, nofollow"/>')) return 'sample content must be noindex';
       if (coach.sample && /"@type":"(SportsActivityLocation|OfferCatalog)"|"telephone"|"jobTitle"/.test(html)) return 'sample content must not publish person/business structured data';
+      if (!coach.sample && html.includes('noindex')) return 'a real coach\'s site must be indexable';
+      // Hidden pages must not be linked from the menus.
+      for (const hidden of HIDDEN_PATHS) if (html.includes(`href="${hidden}"`)) return `links to the hidden page ${hidden}`;
       return null;
     });
   }
-  for (const path of ['/sitemap.xml', '/robots.txt', '/manifest.webmanifest', '/icon', '/apple-icon', '/opengraph-image', '/en/opengraph-image', '/en/blog/protein-how-much/opengraph-image'])
+  for (const path of ['/sitemap.xml', '/robots.txt', '/manifest.webmanifest', '/icon', '/apple-icon', '/opengraph-image', '/en/opengraph-image', ...(ROUTE_PATHS.includes('/en/blog') ? ['/en/blog/protein-how-much/opengraph-image'] : [])])
     await expect(path.includes('opengraph') && !path.startsWith('/en') ? (await fetch(base + '/').then((r) => r.text())).match(/property="og:image" content="https?:\/\/[^/]+([^"?]+)/)?.[1] ?? path : path, 200);
   // Unknown addresses share one static 404 document (src/app/global-not-found.tsx)
   // that holds both languages; it is Arabic by default and switches to
@@ -73,6 +76,7 @@ try {
     : !html.includes('/^\\/en(\\/|$)/') ? 'the 404 should switch to English under /en' : null;
   await expect('/this-page-does-not-exist', 404, bilingual404);
   await expect('/en/this-page-does-not-exist', 404, bilingual404);
+  for (const path of HIDDEN_PATHS) await expect(path, 404);
   await expect('/blog/no-such-post', 404);
   await expect('/en/blog/no-such-post', 404);
 } finally {

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Locale } from '@/lib/i18n';
 import { dict, fill } from '@/lib/i18n';
-import { coach, packages, testimonials, transformations } from '@/lib/config';
+import { coach, packages, show, testimonials, transformations } from '@/lib/config';
 import { formatNumber, quote } from '@/lib/format';
 import { faqJsonLd } from '@/lib/jsonld';
 import { route } from '@/lib/routes';
@@ -41,14 +41,18 @@ function Hero({ lang }: { lang: Locale }) {
             <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,var(--bg)_0%,var(--bg)_10%,color-mix(in_srgb,var(--bg)_75%,transparent)_38%,transparent_70%)] lg:hidden" />
           </div>
           {/* Floating proof chips (desktop). */}
-          <div className="absolute start-[-2rem] bottom-16 hidden items-center gap-3 rounded-2xl border border-line bg-surface/90 p-3 pe-5 shadow-2xl backdrop-blur lg:flex">
-            <span className="num grid size-12 place-items-center rounded-xl bg-accent text-2xl text-on-accent">{coach.stats.yearsExperience}</span>
-            <span className="text-sm leading-tight font-bold">{t.home.proof.years}</span>
-          </div>
-          <div className="absolute end-6 top-8 hidden items-center gap-2 rounded-full border border-line bg-surface/90 px-4 py-2.5 text-sm font-bold shadow-2xl backdrop-blur lg:flex">
-            <span className="size-2.5 rounded-full bg-accent shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent)_30%,transparent)]" />
-            {t.home.heroNote}
-          </div>
+          {coach.stats?.yearsExperience !== undefined && (
+            <div className="absolute start-[-2rem] bottom-16 hidden items-center gap-3 rounded-2xl border border-line bg-surface/90 p-3 pe-5 shadow-2xl backdrop-blur lg:flex">
+              <span className="num grid size-12 place-items-center rounded-xl bg-accent text-2xl text-on-accent">{coach.stats.yearsExperience}</span>
+              <span className="text-sm leading-tight font-bold">{t.home.proof.years}</span>
+            </div>
+          )}
+          {coach.promises?.replyTime && (
+            <div className="absolute end-6 top-8 hidden items-center gap-2 rounded-full border border-line bg-surface/90 px-4 py-2.5 text-sm font-bold shadow-2xl backdrop-blur lg:flex">
+              <span className="size-2.5 rounded-full bg-accent shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent)_30%,transparent)]" />
+              {coach.promises.replyTime[lang]}
+            </div>
+          )}
         </div>
 
         <div className="relative z-10 pt-[30svh] pb-28 lg:p-0">
@@ -105,14 +109,18 @@ function Marquee({ lang }: { lang: Locale }) {
 
 function Proof({ lang }: { lang: Locale }) {
   const t = dict(lang).home.proof;
-  const stats: { value: number; label: string; icon: IconName }[] = [
-    { value: coach.stats.yearsExperience, label: t.years, icon: 'award' },
-    { value: coach.stats.clients, label: t.clients, icon: 'user' },
-    { value: coach.stats.transformations, label: t.transformations, icon: 'results' },
-  ];
+  // Only the numbers the coach has given.
+  const stats = (
+    [
+      { value: coach.stats?.yearsExperience, label: t.years, icon: 'award' },
+      { value: coach.stats?.clients, label: t.clients, icon: 'user' },
+      { value: coach.stats?.transformations, label: t.transformations, icon: 'results' },
+    ] as { value: number | undefined; label: string; icon: IconName }[]
+  ).filter((s): s is { value: number; label: string; icon: IconName } => s.value !== undefined);
+  if (!stats.length) return null;
   return (
     <section aria-label={t.label} className="cv-auto container-x pt-14 md:pt-20">
-      <dl className="grid grid-cols-3 gap-2 md:gap-4" data-reveal>
+      <dl className={`grid gap-2 md:gap-4 ${['', 'grid-cols-1', 'grid-cols-2', 'grid-cols-3'][stats.length]}`} data-reveal>
         {stats.map((s) => (
           <div key={s.label} className="card flex flex-col items-center gap-1 px-2 py-5 text-center md:items-start md:px-7 md:py-7 md:text-start">
             <dt className="flex items-center gap-2 text-xs leading-tight font-semibold text-muted md:text-base">
@@ -208,20 +216,22 @@ function Services({ lang }: { lang: Locale }) {
 }
 
 function Steps({ lang }: { lang: Locale }) {
+  const steps = coach.promises?.steps ?? [];
+  if (!steps.length) return null;
   const t = dict(lang).home.steps;
   return (
     <section className="cv-auto container-x py-16 md:py-24" aria-labelledby="steps-title">
       <SectionHeading id="steps-title" eyebrow={t.eyebrow} title={t.title} />
-      <ol className="grid gap-3 md:grid-cols-4 md:gap-5" data-reveal>
-        {t.items.map((step, i) => (
-          <li key={step.title} className="card relative flex gap-4 overflow-hidden p-5 md:flex-col md:p-7">
+      <ol className={`grid gap-3 md:gap-5 ${steps.length >= 4 ? 'md:grid-cols-4' : 'md:grid-cols-3'}`} data-reveal>
+        {steps.map(({ title, text }, i) => (
+          <li key={title.en} className="card relative flex gap-4 overflow-hidden p-5 md:flex-col md:p-7">
             <span aria-hidden="true" className="num pointer-events-none absolute -end-2 -bottom-6 text-[7rem] leading-none text-ink/[0.05]">
               {i + 1}
             </span>
             <span className="num grid size-12 shrink-0 place-items-center rounded-2xl bg-accent text-2xl text-on-accent">{i + 1}</span>
             <div>
-              <h3 className="text-lg font-black">{step.title}</h3>
-              <p className="mt-1 text-pretty text-muted">{step.text}</p>
+              <h3 className="text-lg font-black">{title[lang]}</h3>
+              <p className="mt-1 text-pretty text-muted">{text[lang]}</p>
             </div>
           </li>
         ))}
@@ -354,9 +364,11 @@ export default function HomePage({ lang }: { lang: Locale }) {
         <Marquee lang={lang} />
         <Proof lang={lang} />
       </Suspense>
-      <Suspense>
-        <Featured lang={lang} />
-      </Suspense>
+      {show.transformations && (
+        <Suspense>
+          <Featured lang={lang} />
+        </Suspense>
+      )}
       <Suspense>
         <Services lang={lang} />
       </Suspense>
@@ -364,16 +376,20 @@ export default function HomePage({ lang }: { lang: Locale }) {
         <Steps lang={lang} />
         <Tools lang={lang} />
       </Suspense>
+      {show.testimonials && (
+        <Suspense>
+          <Reviews lang={lang} />
+        </Suspense>
+      )}
       <Suspense>
-        <Reviews lang={lang} />
-      </Suspense>
-      <Suspense>
-        <section className="cv-auto container-x pt-16 md:pt-24" aria-labelledby="faq-title">
-          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-            <SectionHeading id="faq-title" eyebrow={t.home.faq.eyebrow} title={t.home.faq.title} />
-            <Faq lang={lang} />
-          </div>
-        </section>
+        {show.faq && (
+          <section className="cv-auto container-x pt-16 md:pt-24" aria-labelledby="faq-title">
+            <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+              <SectionHeading id="faq-title" eyebrow={t.home.faq.eyebrow} title={t.home.faq.title} />
+              <Faq lang={lang} />
+            </div>
+          </section>
+        )}
         <FinalCta lang={lang} />
       </Suspense>
     </>

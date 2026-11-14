@@ -1,6 +1,7 @@
 import type {
   BookingConfig,
   CoachConfig,
+  FeaturesConfig,
   FaqConfig,
   Localized,
   PackageConfig,
@@ -21,6 +22,7 @@ import { contrastRatio, isHex } from './contrast.ts';
 
 export interface SiteConfig {
   coach: CoachConfig;
+  features: FeaturesConfig;
   theme: ThemeConfig;
   booking: BookingConfig;
   packages: PackageConfig[];
@@ -78,33 +80,54 @@ export const validateConfig = (config: SiteConfig): string[] => {
     fail('coach.ts', 'siteUrl', 'must be a full address like "https://coach.example.com"', coach.siteUrl);
   }
   for (const key of ['name', 'shortName', 'title', 'role', 'headline', 'intro'] as const) text('coach.ts', key, coach[key]);
-  for (const lang of ['ar', 'en'] as const)
-    if (!Array.isArray(coach.story?.[lang]) || coach.story[lang].length === 0 || coach.story[lang].some((p) => !p.trim()))
-      fail('coach.ts', `story.${lang}`, 'needs at least one non-empty paragraph');
-  coach.principles.forEach((p, i) => {
+  // Optional sections: missing or empty is fine (the site hides them); what
+  // is there must be complete.
+  if (coach.story) {
+    const counts = (['ar', 'en'] as const).map((lang) => (Array.isArray(coach.story![lang]) ? coach.story![lang].length : -1));
+    if (counts[0] !== counts[1]) fail('coach.ts', 'story', 'needs the same number of paragraphs in ar and en', counts);
+    for (const lang of ['ar', 'en'] as const) coach.story[lang]?.forEach((p, i) => !p.trim() && fail('coach.ts', `story.${lang}[${i}]`, 'is empty'));
+  }
+  coach.principles?.forEach((p, i) => {
     text('coach.ts', `principles[${i}].title`, p.title);
     text('coach.ts', `principles[${i}].text`, p.text);
   });
   if (!/^[1-9]\d{7,14}$/.test(coach.whatsapp))
     fail('coach.ts', 'whatsapp', 'must be the international number in digits only, with the country code and no "+", e.g. "201001234567"', coach.whatsapp);
   if (coach.email !== undefined && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(coach.email)) fail('coach.ts', 'email', 'is not an email address', coach.email);
-  for (const key of ['yearsExperience', 'clients', 'transformations'] as const)
-    if (!Number.isInteger(coach.stats[key]) || coach.stats[key] < 0) fail('coach.ts', `stats.${key}`, 'must be a whole number, 0 or more', coach.stats[key]);
-  coach.certifications.forEach((c, i) => {
+  for (const [key, value] of Object.entries(coach.stats ?? {}))
+    if (value !== undefined && (!Number.isInteger(value) || value < 0)) fail('coach.ts', `stats.${key}`, 'must be a whole number, 0 or more', value);
+  coach.certifications?.forEach((c, i) => {
     text('coach.ts', `certifications[${i}].name`, c.name);
     text('coach.ts', `certifications[${i}].issuer`, c.issuer);
     if (!Number.isInteger(c.year) || c.year < 1950 || c.year > 2100) fail('coach.ts', `certifications[${i}].year`, 'must be a year', c.year);
   });
   const loc = coach.location;
-  for (const key of ['gym', 'address', 'city', 'hours'] as const) text('coach.ts', `location.${key}`, loc[key]);
-  if (!/^[A-Z]{2}$/.test(loc.country)) fail('coach.ts', 'location.country', 'must be a two-letter country code like "EG"', loc.country);
-  if (!/^https:\/\//.test(loc.mapUrl)) fail('coach.ts', 'location.mapUrl', 'must be an https link', loc.mapUrl);
-  if (loc.geo && (Math.abs(loc.geo.lat) > 90 || Math.abs(loc.geo.lng) > 180)) fail('coach.ts', 'location.geo', 'has an impossible latitude/longitude', loc.geo);
-  for (const [name, href] of Object.entries(coach.socials))
+  if (loc) {
+    text('coach.ts', 'location.gym', loc.gym);
+    for (const key of ['address', 'city', 'hours'] as const) if (loc[key]) text('coach.ts', `location.${key}`, loc[key]);
+    if (loc.country !== undefined && !/^[A-Z]{2}$/.test(loc.country)) fail('coach.ts', 'location.country', 'must be a two-letter country code like "EG"', loc.country);
+    if (loc.mapUrl !== undefined && !/^https:\/\//.test(loc.mapUrl)) fail('coach.ts', 'location.mapUrl', 'must be an https link', loc.mapUrl);
+    if (loc.geo && (Math.abs(loc.geo.lat) > 90 || Math.abs(loc.geo.lng) > 180)) fail('coach.ts', 'location.geo', 'has an impossible latitude/longitude', loc.geo);
+  }
+  for (const [name, href] of Object.entries(coach.socials ?? {}))
     if (href !== undefined && !/^https:\/\//.test(href)) fail('coach.ts', `socials.${name}`, 'must be an https link', href);
+  const promises = coach.promises;
+  if (promises) {
+    if (promises.replyTime) text('coach.ts', 'promises.replyTime', promises.replyTime);
+    promises.steps?.forEach((st, i) => {
+      text('coach.ts', `promises.steps[${i}].title`, st.title);
+      text('coach.ts', `promises.steps[${i}].text`, st.text);
+    });
+    promises.afterBooking?.forEach((st, i) => text('coach.ts', `promises.afterBooking[${i}]`, st));
+    if (promises.guarantee) {
+      text('coach.ts', 'promises.guarantee.title', promises.guarantee.title);
+      text('coach.ts', 'promises.guarantee.text', promises.guarantee.text);
+    }
+  }
+  if (typeof config.features?.blog !== 'boolean') fail('features.ts', 'blog', 'must be true or false', config.features?.blog);
   picture('coach.ts', 'images.hero', coach.images.hero);
   picture('coach.ts', 'images.portrait', coach.images.portrait);
-  picture('coach.ts', 'images.map', coach.images.map);
+  if (coach.images.map) picture('coach.ts', 'images.map', coach.images.map);
   if (!/^[A-Z]{3}$/.test(coach.currency.code)) fail('coach.ts', 'currency.code', 'must be a three-letter currency code like "EGP"', coach.currency.code);
   text('coach.ts', 'currency.label', coach.currency.label);
   if (coach.arabicDigits !== 'latn' && coach.arabicDigits !== 'arab') fail('coach.ts', 'arabicDigits', 'must be "latn" or "arab"', coach.arabicDigits);
@@ -242,23 +265,27 @@ export const samplePlaceholders = (config: SiteConfig): { file: string; path: st
   if (/(^|[./@])example\.(com|org|net)$|\.example(\.|$)/i.test(new URL(coach.siteUrl, 'https://x.invalid').hostname)) flag('coach.ts', 'siteUrl', coach.siteUrl);
   if (coach.email && /@(.+\.)?example\.(com|org|net)$/i.test(coach.email)) flag('coach.ts', 'email', coach.email);
   if (coach.name.en === 'Coach Adam' || coach.name.ar === 'الكابتن آدم') flag('coach.ts', 'name', coach.name);
-  coach.certifications.forEach((c, i) => {
+  coach.certifications?.forEach((c, i) => {
     if (sampleWord.test(c.name.en) || sampleWord.test(c.name.ar)) flag('coach.ts', `certifications[${i}].name`, c.name.en);
   });
-  for (const key of ['gym', 'address'] as const)
-    if (sampleWord.test(coach.location[key].en) || sampleWord.test(coach.location[key].ar) || /sample/i.test(coach.location[key].en)) flag('coach.ts', `location.${key}`, coach.location[key].en);
-  for (const [name, href] of Object.entries(coach.socials))
+  for (const key of ['gym', 'address'] as const) {
+    const value = coach.location?.[key];
+    if (value && (sampleWord.test(value.en) || sampleWord.test(value.ar) || /sample/i.test(value.en))) flag('coach.ts', `location.${key}`, value.en);
+  }
+  // Template copy left in the story.
+  if (coach.story?.en.some((p) => /twenty-two kilos overweight|nine years on the same idea/i.test(p))) flag('coach.ts', 'story', 'the template story');
+  for (const [name, href] of Object.entries(coach.socials ?? {}))
     if (href && /^https:\/\/(www\.)?[^/]+\/?$/.test(href)) flag('coach.ts', `socials.${name}`, href);
   const pictures: [string, string, string][] = [
     ['coach.ts', 'images.hero.src', coach.images.hero.src],
     ['coach.ts', 'images.portrait.src', coach.images.portrait.src],
-    ['coach.ts', 'images.map.src', coach.images.map.src],
+    ...(coach.images.map ? [['coach.ts', 'images.map.src', coach.images.map.src] as [string, string, string]] : []),
     ...config.transformations.flatMap((t, i): [string, string, string][] => [
       ['transformations.ts', `transformations[${i}].before.src`, t.before.src],
       ['transformations.ts', `transformations[${i}].after.src`, t.after.src],
     ]),
   ];
-  for (const [file, path, src] of pictures) if (/\/sample-[^/]*$/.test(src)) flag(file, path, src);
+  for (const [file, path, src] of pictures) if (/\/sample-[^/]*$/.test(src) || /^\/images\/coach\/(hero|portrait|map)\.webp$/.test(src)) flag(file, path, src);
   return found;
 };
 

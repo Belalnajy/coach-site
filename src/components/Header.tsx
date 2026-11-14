@@ -6,7 +6,7 @@ import BookLink from './BookLink';
 import HeaderBar from './HeaderBar';
 import LanguageLink from './LanguageLink';
 import Logo from './Logo';
-import { NAV } from './nav';
+import { NAV } from '@/lib/nav';
 import Socials from './Socials';
 import ThemeToggle from './ThemeToggle';
 

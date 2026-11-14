@@ -1,6 +1,6 @@
 import type { Locale } from '@/lib/i18n';
 import { dict, fill } from '@/lib/i18n';
-import { coach, packages } from '@/lib/config';
+import { coach, packages, show } from '@/lib/config';
 import { offersJsonLd } from '@/lib/jsonld';
 import { whatsappUrl } from '@/lib/whatsapp';
 import Icon from '../Icon';
@@ -12,7 +12,7 @@ export default function ProgramsPage({ lang }: { lang: Locale }) {
   const t = dict(lang);
   const sections = [
     { kind: 'online' as const, title: t.programs.online, text: t.programs.onlineText, icon: 'globe' as const },
-    { kind: 'in-person' as const, title: t.programs.inPerson, text: fill(t.programs.inPersonText, { gym: coach.location.gym[lang] }), icon: 'dumbbell' as const },
+    { kind: 'in-person' as const, title: t.programs.inPerson, text: coach.location ? fill(t.programs.inPersonText, { gym: coach.location.gym[lang] }) : t.programs.inPersonTextNoGym, icon: 'dumbbell' as const },
   ];
   const question = lang === 'ar' ? `مرحباً ${coach.shortName.ar}، محتار بين باقتين وأريد اقتراحك.` : `Hi ${coach.shortName.en}, I can’t decide between two programs and would like your advice.`;
   return (
@@ -56,16 +56,18 @@ export default function ProgramsPage({ lang }: { lang: Locale }) {
           );
         })}
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className={`grid gap-4 ${show.guarantee ? 'md:grid-cols-2' : ''}`}>
+          {show.guarantee && (
           <div className="card flex gap-4 p-6 md:p-8">
             <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent/15 text-accent-text">
               <Icon name="shield" size={24} />
             </span>
             <div>
-              <h2 className="text-xl font-black">{t.programs.guaranteeTitle}</h2>
-              <p className="mt-1 text-muted">{t.programs.guaranteeText}</p>
+              <h2 className="text-xl font-black">{coach.promises!.guarantee!.title[lang]}</h2>
+              <p className="mt-1 text-muted">{coach.promises!.guarantee!.text[lang]}</p>
             </div>
           </div>
+          )}
           <div className="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center md:p-8">
             <div className="flex-1">
               <h2 className="text-xl font-black">{t.programs.notSure}</h2>

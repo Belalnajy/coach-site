@@ -11,11 +11,13 @@ import type { BookingConfig } from './types.ts';
  */
 export const booking: BookingConfig = {
   // 0 = Sunday … 6 = Saturday, in the order shown (here Saturday first).
-  days: [6, 0, 1, 2, 3, 4],
+  // These are the visitor's preferences, not opening hours: the coach replies
+  // with what is actually free.
+  days: [6, 0, 1, 2, 3, 4, 5],
   slots: [
-    { id: 'morning', label: { ar: 'صباحاً (7 – 11)', en: 'Morning (7 – 11 am)' } },
-    { id: 'afternoon', label: { ar: 'ظهراً (12 – 4)', en: 'Afternoon (12 – 4 pm)' } },
-    { id: 'evening', label: { ar: 'مساءً (5 – 10)', en: 'Evening (5 – 10 pm)' } },
+    { id: 'morning', label: { ar: 'صباحاً', en: 'Morning' } },
+    { id: 'afternoon', label: { ar: 'ظهراً', en: 'Afternoon' } },
+    { id: 'evening', label: { ar: 'مساءً', en: 'Evening' } },
   ],
   goals: [
     { id: 'fat-loss', label: { ar: 'خسارة الدهون', en: 'Fat loss' } },

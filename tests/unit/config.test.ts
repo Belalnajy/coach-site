@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as site from '../../site.config/index.ts';
-import { ConfigError, assertValidConfig, validateConfig, type SiteConfig } from '../../src/lib/validate.ts';
+import { ConfigError, assertValidConfig, samplePlaceholders, validateConfig, type SiteConfig } from '../../src/lib/validate.ts';
+import { resolveSiteUrl } from '../../src/lib/config.ts';
+import type { TransformationConfig } from '../../site.config/types.ts';
 import { checkFiles } from '../../src/lib/validate-files.ts';
 import { getPosts, parsePost } from '../../src/lib/posts.ts';
 import { ar } from '../../src/locales/ar.ts';
@@ -11,25 +13,78 @@ import { en } from '../../src/locales/en.ts';
 
 const clone = (): SiteConfig => structuredClone({ ...site }) as SiteConfig;
 
-test('the shipped sample config is valid', () => {
-  assert.deepEqual(validateConfig(site), []);
-  assert.doesNotThrow(() => assertValidConfig(site));
+const story = (over: Partial<TransformationConfig> = {}): TransformationConfig => ({
+  id: 'test-01',
+  goal: 'fat-loss',
+  client: { ar: 'عميل', en: 'Client' },
+  duration: { ar: '12 أسبوع', en: '12 weeks' },
+  result: { ar: '−9 كجم', en: '−9 kg' },
+  quote: { ar: 'نص', en: 'Text' },
+  before: { src: '/images/transformations/test-01-before.webp', width: 600, height: 750, alt: { ar: 'قبل', en: 'Before' } },
+  after: { src: '/images/transformations/test-01-after.webp', width: 600, height: 750, alt: { ar: 'بعد', en: 'After' } },
+  sample: false,
+  ...over,
 });
 
-test('the sample config says it is sample, everywhere it matters', () => {
-  assert.equal(site.coach.sample, true);
-  assert.ok(site.transformations.every((t) => t.sample), 'every shipped story is flagged as sample');
-  assert.ok(site.testimonials.every((t) => t.sample), 'every shipped review is flagged as sample');
-  assert.ok(site.testimonials.every((t) => /sample/i.test(t.name.en) && /تجريبي/.test(t.name.ar)));
-  assert.ok(site.transformations.every((t) => /sample/i.test(t.client.en) && /تجريبي/.test(t.client.ar)));
+/** The template's made-up coach, as it ships on the `template` branch. */
+const withTemplatePlaceholders = (): SiteConfig => {
+  const c = clone();
+  c.coach = {
+    ...c.coach,
+    sample: false,
+    whatsapp: '201000000000',
+    siteUrl: 'https://coach-adam.example.com',
+    email: 'hello@coach-adam.example.com',
+    name: { ar: 'الكابتن آدم', en: 'Coach Adam' },
+    certifications: [{ name: { ar: 'مدرب معتمد (عيّنة)', en: 'Certified Personal Trainer (sample)' }, issuer: { ar: 'جهة', en: 'Body' }, year: 2017 }],
+    location: { gym: { ar: 'آيرون يارد جيم (عيّنة)', en: 'Iron Yard Gym (sample)' } },
+    socials: { instagram: 'https://instagram.com/' },
+    images: { ...c.coach.images, hero: { ...c.coach.images.hero, src: '/images/coach/hero.webp' } },
+  };
+  c.transformations = [story({ sample: true, before: { ...story().before, src: '/images/transformations/sample-01-before.webp' } })];
+  c.testimonials = [{ id: 't1', name: { ar: 'مراجعة', en: 'Review' }, context: { ar: 'سياق', en: 'Context' }, quote: { ar: 'نص', en: 'Text' }, rating: 5, sample: true }];
+  return c;
+};
+
+test('the shipped config is valid, and is a real coach (not the template sample)', () => {
+  assert.deepEqual(validateConfig(site), []);
+  assert.doesNotThrow(() => assertValidConfig(site));
+  assert.equal(site.coach.sample, false);
+  assert.deepEqual(samplePlaceholders(site), [], 'no template placeholder is left');
 });
 
 test('pictures referenced by the config exist, at the size the config says', async () => {
   assert.deepEqual(await checkFiles(site), []);
 });
 
-test('a broken config fails with messages that name the file and the field', () => {
+test('optional sections can be empty or missing: a coach can launch with partial content', () => {
+  const minimal = clone();
+  for (const key of ['story', 'principles', 'stats', 'certifications', 'location', 'socials', 'promises', 'email'] as const) delete minimal.coach[key];
+  delete minimal.coach.images.map;
+  minimal.transformations = [];
+  minimal.testimonials = [];
+  minimal.faq = [];
+  minimal.features = { blog: false };
+  assert.deepEqual(validateConfig(minimal), []);
+});
+
+test('what is filled in must still be complete and sensible', () => {
   const bad = clone();
+  bad.coach.location = { gym: { ar: '', en: 'Gym' }, mapUrl: 'http://maps' };
+  bad.coach.stats = { clients: -1 };
+  bad.coach.story = { ar: ['قصة'], en: [] };
+  bad.coach.promises = { afterBooking: [{ ar: 'رد سريع', en: '' }] };
+  const errors = validateConfig(bad);
+  const has = (needle: string) => assert.ok(errors.some((e) => e.includes(needle)), `expected an error mentioning ${needle}\n${errors.join('\n')}`);
+  has('coach.ts → location.gym.ar: must be non-empty text');
+  has('coach.ts → location.mapUrl: must be an https link');
+  has('coach.ts → stats.clients: must be a whole number');
+  has('coach.ts → story: needs the same number of paragraphs in ar and en');
+  has('coach.ts → promises.afterBooking[0].en: must be non-empty text');
+});
+
+test('a broken config fails with messages that name the file and the field', () => {
+  const bad = withTemplatePlaceholders();
   bad.coach.whatsapp = '+20 100 000';
   bad.packages[1].price = -5;
   bad.packages[2].id = bad.packages[0].id;
@@ -49,10 +104,8 @@ test('a broken config fails with messages that name the file and the field', () 
   assert.throws(() => assertValidConfig(bad), (e: unknown) => e instanceof ConfigError && /problems:/.test(e.message));
 });
 
-test('a real coach cannot ship the sample stories, reviews or placeholder details', () => {
-  const live = clone();
-  live.coach.sample = false;
-  const errors = validateConfig(live);
+test('a real coach cannot ship the template\'s sample stories, reviews or placeholder details', () => {
+  const errors = validateConfig(withTemplatePlaceholders());
   const has = (prefix: string) => assert.ok(errors.some((e) => e.startsWith(prefix)), `expected an error starting with ${prefix}\n${errors.join('\n')}`);
   has('site.config/transformations.ts → transformations[0].sample');
   has('site.config/testimonials.ts → testimonials[0].sample');
@@ -63,28 +116,14 @@ test('a real coach cannot ship the sample stories, reviews or placeholder detail
   has('site.config/coach.ts → certifications[0].name: still holds the template');
   has('site.config/coach.ts → location.gym: still holds the template');
   has('site.config/coach.ts → socials.instagram: still holds the template');
+  has('site.config/coach.ts → images.hero.src: still holds the template');
   has('site.config/transformations.ts → transformations[0].before.src: still holds the template');
 });
 
-test('a real coach with real details passes the placeholder guard', () => {
-  const live = clone();
-  live.coach.sample = false;
-  live.coach.whatsapp = '201112223334';
-  live.coach.siteUrl = 'https://coach-salma.com';
-  live.coach.email = 'hi@coach-salma.com';
-  live.coach.name = { ar: 'الكوتش سلمى', en: 'Coach Salma' };
-  live.coach.certifications = [{ name: { ar: 'مدربة معتمدة', en: 'Certified trainer' }, issuer: { ar: 'جهة', en: 'Body' }, year: 2020 }];
-  live.coach.location.gym = { ar: 'جيم النخبة', en: 'Elite Gym' };
-  live.coach.location.address = { ar: 'شارع التسعين', en: '90th Street' };
-  live.coach.socials = { instagram: 'https://instagram.com/coach.salma' };
-  live.transformations = live.transformations.slice(0, 1).map((t) => ({
-    ...t,
-    sample: false,
-    before: { ...t.before, src: '/images/transformations/salma-01-before.webp' },
-    after: { ...t.after, src: '/images/transformations/salma-01-after.webp' },
-  }));
-  live.testimonials = live.testimonials.map((t) => ({ ...t, sample: false }));
-  assert.deepEqual(validateConfig(live), []);
+test('the site address: Vercel production domain, SITE_URL override, config fallback', () => {
+  assert.equal(resolveSiteUrl('http://localhost:3000', {}), 'http://localhost:3000');
+  assert.equal(resolveSiteUrl('http://localhost:3000', { VERCEL_PROJECT_PRODUCTION_URL: 'coach-site.vercel.app' }), 'https://coach-site.vercel.app');
+  assert.equal(resolveSiteUrl('http://localhost:3000', { VERCEL_PROJECT_PRODUCTION_URL: 'coach-site.vercel.app', SITE_URL: 'https://coachmohamed.com/' }), 'https://coachmohamed.com');
 });
 
 test('light palette: selections and error text are readable', () => {
@@ -97,8 +136,10 @@ test('light palette: selections and error text are readable', () => {
 });
 
 test('only one popular package on the whole site, and a bad colour is reported', () => {
-  assert.equal(site.packages.filter((p) => p.popular).length, 1, 'the sample marks exactly one package');
+  assert.ok(site.packages.filter((p) => p.popular).length <= 1, 'at most one package is marked popular');
   const bad = clone();
+  bad.packages.forEach((p) => (p.popular = false));
+  bad.packages[0].popular = true;
   bad.packages[3].popular = true;
   bad.theme.accent = 'lime';
   const errors = validateConfig(bad);
